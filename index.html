@@ -2,10 +2,9 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Різдвяна Магічна Куля</title>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎄 Різдвяна Магічна Куля</title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
     <style>
         * {
@@ -14,178 +13,137 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
-            /* Фон буде прихований під відеопотоком AR */
-            background: #0a0f2c;
-            color: white;
-            overflow: hidden;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .header {
-            text-align: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
-        }
-
-        .title {
-            font-size: 2.2em;
-            margin-bottom: 8px;
-            text-shadow: 0 0 10px #00b0ff;
-        }
-
-        .subtitle {
-            font-size: 1.1em;
-            opacity: 0.85;
-        }
-
-        .ar-section {
-            background: rgba(10, 15, 44, 0.6);
-            border-radius: 16px;
-            padding: 16px;
-            backdrop-filter: blur(8px);
-        }
-
-        #ar-scene {
+        html, body {
             width: 100%;
-            height: 500px;
-            border-radius: 12px;
+            height: 100%;
             overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-            position: relative;
+            background: transparent;
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+            color: white;
         }
 
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.4em;
-            color: #00b0ff;
+        a-scene {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            background: transparent;
         }
 
-        .control-panel {
+        .loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            background: rgba(10, 15, 44, 0.8);
+            z-index: 1000;
+            text-align: center;
+            padding: 20px;
         }
 
-        .btn {
-            padding: 10px 18px;
+        .loader h1 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px #00b0ff;
+            animation: glow 2s infinite alternate;
+        }
+
+        .loader p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00b0ff; }
+            to { text-shadow: 0 0 20px #ff00ff, 0 0 30px #00b0ff; }
+        }
+
+        .sound-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            padding: 12px 24px;
             border: none;
             border-radius: 24px;
             background: linear-gradient(45deg, #00b0ff, #ff00ff);
             color: white;
-            cursor: pointer;
             font-weight: bold;
-            transition: transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        .instructions {
-            background: rgba(10, 15, 44, 0.6);
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 20px;
-            backdrop-filter: blur(8px);
-        }
-
-        .instructions h2 {
-            color: #4fc3f7;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .step {
-            display: flex;
-            margin: 12px 0;
-            font-size: 0.95em;
-        }
-
-        .step-number {
-            background: #00b0ff;
-            color: white;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85em;
-            margin-right: 10px;
-            flex-shrink: 0;
+            cursor: pointer;
+            font-size: 1em;
         }
     </style>
 </head>
 <body>
-    <!-- Видалено snowflakes -->
-
-    <div class="container">
-        <header class="header">
-            <h1 class="title">🎄 Різдвяна Магічна Куля</h1>
-            <p class="subtitle">Скануй маркер — і побач пророцтво!</p>
-        </header>
-
-        <div class="ar-section">
-            <div id="ar-scene">
-                <div class="loading">
-                    <p>⏳ Завантаження...</p>
-                    <p>Надай доступ до камери</p>
-                </div>
-            </div>
-            <div class="control-panel">
-                <button class="btn" onclick="startAR()">▶️ Старт AR</button>
-                <button class="btn" onclick="stopAR()">⏹️ Стоп AR</button>
-                <button class="btn" onclick="toggleSound()">🔊 Звук</button>
-            </div>
-        </div>
-
-        <div class="instructions">
-            <h2>Як це працює:</h2>
-            <div class="step">
-                <div class="step-number">1</div>
-                <p>Натисни «Старт AR» і дозволь доступ до камери.</p>
-            </div>
-            <div class="step-number">2</div>
-            <p>Наведи камеру на маркер (marker.mind).</p>
-            <div class="step">
-                <div class="step-number">3</div>
-                <p>Торкнись кулі — і побачиш пророцтво!</p>
-            </div>
-        </div>
+    <!-- Лоадер -->
+    <div class="loader" id="loader">
+        <h1>🎄 Різдвяна Магічна Куля</h1>
+        <p>Наведи камеру на маркер!</p>
     </div>
 
-    <script>
-        // Аудіо (налаштуй шлях)
-        const audio = new Audio('fon.mp3');
-        audio.loop = true;
-        let isSoundOn = true;
+    <!-- WebAR сцена -->
+    <a-scene
+        mindar-image="imageTargetSrc: assets/marker.mind; maxTrack: 1"
+        embedded
+        renderer="colorManagement: true; physicallyCorrectLights: true;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
+        loading-screen="enabled: false"
+    >
+        <a-assets>
+            <audio id="bg-music" src="fon.mp3" preload="auto" loop></audio>
+        </a-assets>
 
-        function toggleSound() {
-            isSoundOn = !isSoundOn;
-            if (isSoundOn) {
-                audio.play().catch(e => console.log("Audio play failed:", e));
-            } else {
-                audio.pause();
-            }
-        }
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <a-entity mindar-image-target="targetIndex: 0">
+            <!-- Блакитна скляна куля -->
+            <a-sphere
+                id="magic-sphere"
+                radius="0.8"
+                position="0 0 0"
+                material="
+                    color: #00b0ff;
+                    transparent: true;
+                    opacity: 0.35;
+                    shader: flat;
+                    side: double
+                "
+                visible="false"
+            >
+                <a-animation
+                    attribute="rotation"
+                    to="0 360 0"
+                    dur="8000"
+                    repeat="indefinite"
+                ></a-animation>
+            </a-sphere>
+        </a-entity>
+    </a-scene>
+
+    <button class="sound-btn" id="sound-btn">🔊 Увімкнути звук</button>
+
+    <script>
+        const loader = document.getElementById('loader');
+        const sphere = document.getElementById('magic-sphere');
+        const bgMusic = document.getElementById('bg-music');
+        const soundBtn = document.getElementById('sound-btn');
 
         let prophecyText = null;
         let prophecyShadow = null;
 
-        function showProphecy(parent) {
-            // Видаляємо попередній текст
+        // Функція показу пророцтва
+        function showProphecy() {
+            const parent = sphere.parentNode;
+
+            // Видаляємо старий текст
             if (prophecyText) {
                 parent.removeChild(prophecyText);
                 prophecyText = null;
@@ -200,19 +158,19 @@
             // Тінь
             prophecyShadow = document.createElement('a-text');
             prophecyShadow.setAttribute('value', message);
-            prophecyShadow.setAttribute('position', '0 0 0.9');
+            prophecyShadow.setAttribute('position', '0 0 0.75');
             prophecyShadow.setAttribute('color', '#000');
             prophecyShadow.setAttribute('opacity', '0.6');
-            prophecyShadow.setAttribute('width', '2.8');
+            prophecyShadow.setAttribute('width', '2.6');
             prophecyShadow.setAttribute('align', 'center');
             prophecyShadow.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
 
             // Основний текст
             prophecyText = document.createElement('a-text');
             prophecyText.setAttribute('value', message);
-            prophecyText.setAttribute('position', '0 0 0.9');
+            prophecyText.setAttribute('position', '0 0 0.75');
             prophecyText.setAttribute('color', '#FFD700');
-            prophecyText.setAttribute('width', '2.8');
+            prophecyText.setAttribute('width', '2.6');
             prophecyText.setAttribute('align', 'center');
             prophecyText.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
             prophecyText.setAttribute('opacity', '0');
@@ -227,7 +185,7 @@
 
             // Зникне через 4 секунди
             setTimeout(() => {
-                if (prophecyText) {
+                if (prophecyText && prophecyText.parentNode) {
                     prophecyText.setAttribute('animation__out', 'property: opacity; to: 0; dur: 800; startEvents: fadeout');
                     prophecyText.emit('fadeout');
                     setTimeout(() => {
@@ -240,75 +198,41 @@
             }, 4000);
         }
 
-        function startAR() {
-            const scene = document.createElement('a-scene');
-            scene.setAttribute('mindar-image', {
-                imageTargetSrc: 'assets/marker.mind',
-                maxTrack: 1
-            });
-            scene.setAttribute('color-space', 'sRGB');
-            scene.setAttribute('embedded', '');
-            scene.setAttribute('renderer', 'colorManagement: true, physicallyCorrectLights');
-            scene.setAttribute('cursor', 'rayOrigin: mouse');
-
-            const camera = document.createElement('a-camera');
-            camera.setAttribute('position', '0 0 0');
-            camera.setAttribute('look-controls', 'enabled: false');
-            scene.appendChild(camera);
-
-            const target = document.createElement('a-entity');
-            target.setAttribute('mindar-image-target', 'targetIndex: 0');
-
-            // 🔵 МАГІЧНА КУЛЯ — блакитне скло
-            const magicSphere = document.createElement('a-sphere');
-            magicSphere.setAttribute('radius', '1');
-            magicSphere.setAttribute('position', '0 0 0');
-            magicSphere.setAttribute('material', `
-                color: #00b0ff;
-                transparent: true;
-                opacity: 0.35;
-                shader: flat;
-                side: double
-            `);
-            magicSphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear');
-
-            target.appendChild(magicSphere);
-            scene.appendChild(target);
-
-            // Обробник кліку
-            magicSphere.addEventListener('click', function () {
-                if (isSoundOn) {
-                    const clickSound = new Audio('fon.mp3');
-                    clickSound.volume = 0.3;
-                    clickSound.play().catch(e => console.log("Click sound failed:", e));
+        // Обробка маркера
+        const target = document.querySelector('[mindar-image-target]');
+        if (target) {
+            target.addEventListener('targetFound', () => {
+                loader.style.display = 'none';
+                sphere.setAttribute('visible', 'true');
+                // Відтворюємо звук автоматично (якщо дозволено)
+                if (bgMusic.paused) {
+                    bgMusic.play().catch(e => console.log("🔇 Audio play failed:", e));
+                    soundBtn.textContent = '🔊 Вимкнути звук';
                 }
-                showProphecy(target);
             });
 
-            // Підключаємо сцену
-            const arContainer = document.getElementById('ar-scene');
-            arContainer.innerHTML = '';
-            arContainer.appendChild(scene);
+            target.addEventListener('targetLost', () => {
+                loader.style.display = 'flex';
+                sphere.setAttribute('visible', 'false');
+                if (!bgMusic.paused) bgMusic.pause();
+                soundBtn.textContent = '🔊 Увімкнути звук';
+            });
+        }
 
-            if (isSoundOn) {
-                audio.play().catch(e => console.log("Background audio failed:", e));
+        // Клік по кулі → пророцтво
+        sphere.addEventListener('click', () => {
+            showProphecy();
+        });
+
+        // Кнопка звуку
+        soundBtn.addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play().catch(e => console.log("🔇 Audio play failed:", e));
+                soundBtn.textContent = '🔊 Вимкнути звук';
+            } else {
+                bgMusic.pause();
+                soundBtn.textContent = '🔊 Увімкнути звук';
             }
-        }
-
-        function stopAR() {
-            const arContainer = document.getElementById('ar-scene');
-            arContainer.innerHTML = `
-                <div class="loading">
-                    <p>⏹️ AR зупинено</p>
-                    <p>Натисни «Старт AR»</p>
-                </div>
-            `;
-            audio.pause();
-        }
-
-        // Ініціалізація — сніжинок НЕМАЄ
-        document.addEventListener('DOMContentLoaded', function () {
-            // createSnowflakes() — НЕ ВИКЛИКАЄМО
         });
     </script>
 </body>
