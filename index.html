@@ -18,7 +18,6 @@
             width: 100% !important; height: 100% !important;
             background: transparent;
         }
-        /* Кнопка звуку — зовні сцени, але не перекривається */
         #sound-btn {
             position: absolute;
             bottom: 20px;
@@ -33,15 +32,25 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 1em;
-            pointer-events: auto; /* важливо! */
+            pointer-events: auto;
+        }
+        /* Fallback плейсхолдер для камери на десктопі (замініть src на реальне відео/зображення) */
+        #camera-fallback {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            object-fit: cover;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- 🔊 Кнопка звуку — ЗОВНІ сцени, але з високим z-index -->
+    <!-- Fallback: тестове відео (замініть src на ваше, наприклад, локальне 'bg.mp4') -->
+    <video id="camera-fallback" src="https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4" autoplay loop muted playsinline></video>
+    
     <button id="sound-btn">🔊 Увімкнути звук</button>
     <a-scene
-        mindar-image="imageTargetSrc: assets/marker.mind; maxTrack: 1"
+        mindar-image="imageTargetSrc: assets/marker.mind; maxTrack: 1; debugMode: true"
         embedded
         renderer="colorManagement: true; physicallyCorrectLights: true;"
         vr-mode-ui="enabled: false"
@@ -51,7 +60,7 @@
     >
         <a-assets>
             <audio id="bg-music" src="fon.mp3" preload="auto" loop></audio>
-            <audio id="prophecy-sound" src="sparkle.mp3" preload="auto"></audio> <!-- Додатковий звук для пророцтва (опціонально, додайте файл) -->
+            <audio id="prophecy-sound" src="sparkle.mp3" preload="auto"></audio>
         </a-assets>
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
         <a-entity mindar-image-target="targetIndex: 0">
@@ -78,10 +87,8 @@
                     dur="10000"
                     repeat="indefinite"
                 ></a-animation>
-                <!-- Додатковий ефект блиску для магії -->
                 <a-entity id="sparkle-light" light="type: point; intensity: 0; color: #FFD700" position="0 0 0"></a-entity>
             </a-sphere>
-            <!-- Система частинок для магічного ефекту (активується при пророцтві) -->
             <a-entity id="particles" particle-system="
                 preset: dust;
                 color: #FFD700,#FF00FF,#00B0FF;
@@ -98,10 +105,10 @@
                 opacity: 0;
             " position="0 0 0" visible="false"></a-entity>
         </a-entity>
-        <!-- Лоадер (всередині сцени) -->
+        <!-- Покращений лоадер з інструкціями -->
         <a-entity id="loader" position="0 0 -2" visible="true">
-            <a-plane width="3" height="1.2" color="#0a0f2c" opacity="0.8" side="double"></a-plane>
-            <a-text value="Наведи камеру на маркер!" align="center" color="#00b0ff" width="2.5" position="0 0 0.01"></a-text>
+            <a-plane width="3" height="1.5" color="#0a0f2c" opacity="0.8" side="double"></a-plane>
+            <a-text value="Наведи камеру на маркер!\n(Перевірте HTTPS + мобільний для камери)" align="center" color="#00b0ff" width="2.8" position="0 0 0.01" font="kelsonsans"></a-text>
         </a-entity>
     </a-scene>
     <script>
@@ -112,9 +119,11 @@
         const sparkleLight = document.getElementById('sparkle-light');
         const particles = document.getElementById('particles');
         const soundBtn = document.getElementById('sound-btn');
+        const cameraFallback = document.getElementById('camera-fallback');
+        const scene = document.querySelector('a-scene');
         let isTargetActive = false;
+        let isMobileAR = false;
         
-        // Масив рандомних пророцтв для магічного ефекту
         const prophecies = [
             "Щасливого Різдва!",
             "Бажаю дива в Новому році!",
@@ -123,7 +132,18 @@
             "Магія вірить у тебе! ✨"
         ];
 
-        // 🔊 Кнопка звуку — незалежна від AR
+        // Виявлення десктопу/fallback
+        isMobileAR = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (!isMobileAR) {
+            console.log("🖥️ Десктоп: Увімкнено fallback без AR-камери");
+            cameraFallback.style.display = 'block';
+            cameraFallback.play().catch(e => console.log("Fallback video failed:", e)); // Фікс: автозапуск
+            loader.setAttribute('visible', 'false');
+            sphere.setAttribute('visible', 'true');
+            isTargetActive = true;
+        }
+
+        // Кнопка звуку
         soundBtn.addEventListener('click', () => {
             if (bgMusic.paused) {
                 bgMusic.play().catch(e => console.log("🔇 Audio failed:", e));
@@ -134,30 +154,25 @@
             }
         });
 
-        // Показ пророцтва НА ЕКВАТОРІ (оновлена версія з рандомом, частинками та звуком)
+        // Функція пророцтва
         function showProphecy() {
             const parent = sphere.parentNode;
-            if (!parent) return; // Фікс: перевірка на існування
+            if (!parent) return;
 
-            const message = prophecies[Math.floor(Math.random() * prophecies.length)]; // Рандомне пророцтво
-            // Видаляємо старий текст
+            const message = prophecies[Math.floor(Math.random() * prophecies.length)];
             [...parent.querySelectorAll('[data-prophecy]')].forEach(el => el.remove());
 
-            // Текст на екваторі: Y=0, Z=0.9 (трохи далі, щоб не зливатися з кулею)
             const text = document.createElement('a-text');
             text.setAttribute('value', message);
-            text.setAttribute('position', '0 0 0.9'); // Збільшено Z для кращої видимості
-            text.setAttribute('color', '#FFD700'); // Золотий — яскравий
-            text.setAttribute('width', '3.0'); // Збільшено ширину для мобільного
+            text.setAttribute('position', '0 0 0.9');
+            text.setAttribute('color', '#FFD700');
+            text.setAttribute('width', '3.5');
             text.setAttribute('align', 'center');
-            // Fallback шрифт: вбудований, без CDN
-            text.setAttribute('font', 'kelsonsans'); // Вбудований A-Frame шрифт (завжди доступний)
-            // Анімація fade-in: з startEvents для контролю
+            text.setAttribute('font', 'kelsonsans');
             text.setAttribute('opacity', '0');
             text.setAttribute('animation__fadein', 
                 'property: opacity; from: 0; to: 1; dur: 1500; easing: easeOutCubic; startEvents: startFadeIn'
             );
-            // Додаткова анімація: пульсація кольору для магії
             text.setAttribute('animation__pulse', 
                 'property: color; from: #FFD700; to: #FF4500; dir: alternate; dur: 500; repeat: 4; startEvents: startFadeIn'
             );
@@ -166,83 +181,87 @@
 
             parent.appendChild(text);
 
-            // Магічні ефекти: звук, частинки, блиск
-            if (!prophecySound.paused && !prophecySound.ended) {
+            // Ефекти (з перевірками)
+            if (prophecySound) {
                 prophecySound.currentTime = 0;
-                prophecySound.play().catch(e => console.log("🔇 Prophecy sound failed:", e));
+                prophecySound.play().catch(e => console.log("🔇 Prophecy sound:", e));
             }
-            // Активація частинок
             particles.setAttribute('visible', 'true');
             particles.setAttribute('animation__particles', 'property: opacity; from: 0; to: 1; dur: 500; startEvents: startParticles');
             particles.emit('startParticles');
-            // Блиск кулі
             sparkleLight.setAttribute('light: intensity', '1');
             setTimeout(() => sparkleLight.setAttribute('light: intensity', '0'), 2000);
 
-            // Запуск fade-in (з затримкою для "магічного" ефекту)
             setTimeout(() => {
                 if (text.parentNode) text.emit('startFadeIn');
             }, 200);
 
-            // Fade-out через 5 сек (після fade-in + пауза)
             setTimeout(() => {
                 if (text.parentNode) {
-                    text.setAttribute('animation__fadeout', 
-                        'property: opacity; to: 0; dur: 1000; startEvents: startFadeOut'
-                    );
+                    text.setAttribute('animation__fadeout', 'property: opacity; to: 0; dur: 1000; startEvents: startFadeOut');
                     text.emit('startFadeOut');
-                    // Видалення після анімації
-                    setTimeout(() => { 
-                        if (text.parentNode) text.parentNode.removeChild(text); 
-                    }, 1000);
+                    setTimeout(() => { if (text.parentNode) text.parentNode.removeChild(text); }, 1000);
                 }
-                // Приховати частинки
                 setTimeout(() => {
-                    particles.setAttribute('animation__hide', 'property: opacity; to: 0; dur: 500');
+                    particles.setAttribute('visible', 'false');
+                    particles.setAttribute('animation__particles', null); // Очищення анімації для наступного разу
                 }, 1000);
             }, 5000);
         }
 
-        // Обробка маркера
+        // Обробка MindAR (автоматичний старт, з перевіркою)
+        const startMindAR = () => {
+            scene.addEventListener('renderstart', () => {
+                console.log("🎥 A-Frame рендер стартував");
+                const mindar = scene.components['mindar-image'];
+                if (mindar && !mindar.isStarted) { // Фікс: перевірка на вже запущений
+                    mindar.start().then(() => {
+                        console.log("✅ MindAR/камера активна!");
+                        if (cameraFallback) cameraFallback.style.display = 'none';
+                    }).catch(err => {
+                        console.error("❌ MindAR помилка (маркер/permissions):", err);
+                    });
+                } else {
+                    console.log("MindAR вже запущений або недоступний");
+                }
+            });
+        };
+
+        // AR події
         const target = document.querySelector('[mindar-image-target]');
         if (target) {
+            startMindAR();
             target.addEventListener('targetFound', () => {
                 isTargetActive = true;
                 loader.setAttribute('visible', 'false');
                 sphere.setAttribute('visible', 'true');
-                // Автозапуск фонової музики при знаходженні маркера (з перевіркою)
-                if (bgMusic.paused) {
-                    bgMusic.play().catch(e => console.log("🔇 BG music failed:", e));
+                if (bgMusic && bgMusic.paused) {
+                    bgMusic.play().catch(e => console.log("🔇 BG music:", e));
                 }
             });
             target.addEventListener('targetLost', () => {
                 isTargetActive = false;
                 loader.setAttribute('visible', 'true');
                 sphere.setAttribute('visible', 'false');
-                // При втраті маркера — приховуємо пророцтво та ефекти
-                [...sphere.parentNode.querySelectorAll('[data-prophecy]')].forEach(el => el.remove());
+                [...document.querySelectorAll('[data-prophecy]')].forEach(el => el.remove());
                 particles.setAttribute('visible', 'false');
                 sparkleLight.setAttribute('light: intensity', '0');
             });
         }
 
-        // ✅ Клік по кулі → пророцтво
+        // Клік/тач → пророцтво
         sphere.addEventListener('click', (evt) => {
-            if (isTargetActive) {
+            if (isTargetActive || !isMobileAR) {
                 evt.preventDefault();
                 showProphecy();
                 console.log("✨ Пророцтво активовано!");
             }
         });
 
-        // 📱 Мобільний fallback: торкання екрану (окрім кнопки) → пророцтво
         document.body.addEventListener('touchstart', (e) => {
-            if (isTargetActive) {
-                // Якщо торкнулися не кнопки — активувати пророцтво
-                if (!e.target.closest('#sound-btn')) {
-                    e.preventDefault();
-                    showProphecy();
-                }
+            if ((isTargetActive || !isMobileAR) && !e.target.closest('#sound-btn')) {
+                e.preventDefault();
+                showProphecy();
             }
         }, { passive: false });
     </script>
