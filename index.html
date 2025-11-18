@@ -118,10 +118,6 @@
             flex-shrink: 0;
         }
 
-        .wishes {
-            display: none; /* Прибираємо текстові побажання */
-        }
-
         .loading {
             text-align: center;
             padding: 50px;
@@ -211,7 +207,7 @@
     <div class="container">
         <header class="header">
             <h1 class="title">🎄 Різдвяна Магічна Куля ✨</h1>
-            <p class="subtitle">Скануй маркер та відкрий чарівний світ різдвяних побажань!</p>
+            <p class="subtitle">Скануй маркер та відкрий чарівний світ різдвяної магії!</p>
         </header>
 
         <div class="content">
@@ -248,23 +244,13 @@
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <p>Натискай на кулю — і вона подарує тобі магічний ефект!</p>
+                    <p>Торкнись кулі — і побачиш знак магії!</p>
                 </div>
             </div>
         </div>
-
-        <!-- ВИКЛЮЧАЄМО БЛОК ПОБАЖАНЬ -->
-        <!-- <div class="wishes">
-            <h2 style="text-align: center; color: #ffeb3b; margin-bottom: 20px;">
-                🌟 Різдвяні Побажання для Тебе!
-            </h2>
-            ... (текст видалено)
-        </div> -->
-
     </div>
 
     <script>
-        // Створення сніжинок
         function createSnowflakes() {
             const snowflakesContainer = document.getElementById('snowflakes');
             const snowflakes = ['❄️', '✨', '⭐', '💫', '🔸'];
@@ -280,7 +266,6 @@
             }
         }
 
-        // Аудіо менеджер
         const audio = new Audio('fon.mp3');
         audio.loop = true;
         let isSoundOn = true;
@@ -294,59 +279,43 @@
             }
         }
 
-        // Функція для створення магічного ефекту (іскри / сніжинки / спалах)
-        function createMagicEffect(parent) {
-            // Створюємо "спалах"
-            const flash = document.createElement('a-sphere');
-            flash.setAttribute('radius', '1.3');
-            flash.setAttribute('material', 'shader: flat; color: #ff00ff; transparent: true; opacity: 0.7');
-            flash.setAttribute('animation', 'property: opacity; to: 0; dur: 800; easing: easeOutQuad');
-            flash.setAttribute('animation__scale', 'property: scale; to: 2.5 2.5 2.5; dur: 800');
-            parent.appendChild(flash);
+        let magicSign = null;
 
-            // Додаємо іскри
-            for (let i = 0; i < 8; i++) {
-                const spark = document.createElement('a-sphere');
-                const angle = (i / 8) * Math.PI * 2;
-                const x = Math.cos(angle) * 0.5;
-                const y = Math.sin(angle) * 0.5;
-                spark.setAttribute('radius', '0.05');
-                spark.setAttribute('position', `${x} ${y} 0`);
-                spark.setAttribute('color', '#ffff00');
-                spark.setAttribute('transparent', 'true');
-                spark.setAttribute('opacity', '0.8');
-                spark.setAttribute('animation', 'property: position; to: 0 0 0; dur: 800; easing: easeInCubic');
-                spark.setAttribute('animation__fade', 'property: opacity; to: 0; dur: 800; easing: easeInCubic');
-                parent.appendChild(spark);
-                setTimeout(() => {
-                    if (spark.parentNode) spark.parentNode.removeChild(spark);
-                }, 800);
+        function createMagicSign(parent) {
+            // Видаляємо попередній знак
+            if (magicSign && magicSign.parentNode) {
+                magicSign.parentNode.removeChild(magicSign);
             }
 
-            // Додаємо сніжинки (якщо хочеш)
-            for (let i = 0; i < 5; i++) {
-                const snow = document.createElement('a-entity');
-                const angle = (i / 5) * Math.PI * 2;
-                const x = Math.cos(angle) * 0.7;
-                const y = Math.sin(angle) * 0.7;
-                snow.setAttribute('position', `${x} ${y} 0`);
-                snow.innerHTML = `
-                    <a-text value="❄️" color="#ffffff" width="0.5" align="center" position="0 0 0"></a-text>
-                `;
-                snow.setAttribute('animation', 'property: position; to: 0 0 0; dur: 1000; easing: easeInCubic');
-                snow.setAttribute('animation__fade', 'property: opacity; to: 0; dur: 1000; easing: easeInCubic');
-                parent.appendChild(snow);
-                setTimeout(() => {
-                    if (snow.parentNode) snow.parentNode.removeChild(snow);
-                }, 1000);
-            }
+            magicSign = document.createElement('a-text');
+            magicSign.setAttribute('value', '!');
+            magicSign.setAttribute('position', '0 1.3 0'); // над кулею (північний полюс)
+            magicSign.setAttribute('color', '#ffffff');
+            magicSign.setAttribute('align', 'center');
+            magicSign.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
+            magicSign.setAttribute('side', 'double');
+            magicSign.setAttribute('opacity', '0');
+            magicSign.setAttribute('animation__fade', 'property: opacity; from: 0; to: 1; dur: 600; easing: easeOutCubic');
+            magicSign.setAttribute('animation__scale', 'property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; dur: 600; easing: easeOutBack');
+            magicSign.setAttribute('animation__pulse', 'property: scale; from: 1.5 1.5 1.5; to: 1.2 1.2 1.2; dur: 1000; loop: true; dir: alternate; easing: easeInOutSine');
 
+            parent.appendChild(magicSign);
+
+            // Зникне через 3 секунди
             setTimeout(() => {
-                if (flash.parentNode) flash.parentNode.removeChild(flash);
-            }, 800);
+                if (magicSign && magicSign.parentNode) {
+                    magicSign.setAttribute('animation__disappear', 'property: opacity; to: 0; dur: 800; startEvents: disappear');
+                    magicSign.emit('disappear');
+                    setTimeout(() => {
+                        if (magicSign && magicSign.parentNode) {
+                            magicSign.parentNode.removeChild(magicSign);
+                            magicSign = null;
+                        }
+                    }, 800);
+                }
+            }, 3000);
         }
 
-        // AR сцена
         function startAR() {
             const scene = document.createElement('a-scene');
             scene.setAttribute('mindar-image', {
@@ -368,76 +337,69 @@
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
-            // Основна куля
-            const sphere = document.createElement('a-sphere');
-            sphere.setAttribute('radius', '1');
-            sphere.setAttribute('position', '0 0 0');
-            sphere.setAttribute('color', '#ff0080');
-            sphere.setAttribute('transparent', 'true');
-            sphere.setAttribute('opacity', '0.8');
-            sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000');
+            // Скляна оболонка кулі (зовнішня)
+            const glassShell = document.createElement('a-sphere');
+            glassShell.setAttribute('radius', '1');
+            glassShell.setAttribute('position', '0 0 0');
+            glassShell.setAttribute('material', 'transparent: true; opacity: 0.25; color: #e0f7fa; shader: flat');
+            glassShell.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
 
-            // Внутрішній куб
+            // Внутрішнє світіння (емісія)
+            const innerGlow = document.createElement('a-sphere');
+            innerGlow.setAttribute('radius', '0.95');
+            innerGlow.setAttribute('position', '0 0 0');
+            innerGlow.setAttribute('material', 'transparent: true; opacity: 0.4; color: #00b0ff; shader: flat; emissive: #00b0ff; emissiveIntensity: 0.8');
+
+            // Внутрішній куб (залишаємо для магії, але робимо дискретним)
             const innerCube = document.createElement('a-box');
-            innerCube.setAttribute('width', '1.2');
-            innerCube.setAttribute('height', '1.2');
-            innerCube.setAttribute('depth', '1.2');
+            innerCube.setAttribute('width', '1.1');
+            innerCube.setAttribute('height', '1.1');
+            innerCube.setAttribute('depth', '1.1');
             innerCube.setAttribute('position', '0 0 0');
-            innerCube.setAttribute('color', '#00ffff');
+            innerCube.setAttribute('color', '#ff00ff');
             innerCube.setAttribute('transparent', 'true');
-            innerCube.setAttribute('opacity', '0.3');
+            innerCube.setAttribute('opacity', '0.2');
             innerCube.setAttribute('wireframe', 'true');
             innerCube.setAttribute('animation', 'property: rotation; to: 360 360 360; loop: true; dur: 15000');
 
-            // Зовнішня піраміда
-            const outerPyramid = document.createElement('a-cone');
-            outerPyramid.setAttribute('radius-bottom', '1.5');
-            outerPyramid.setAttribute('radius-top', '0.1');
-            outerPyramid.setAttribute('height', '2');
-            outerPyramid.setAttribute('position', '0 0 0');
-            outerPyramid.setAttribute('color', '#ffff00');
-            outerPyramid.setAttribute('transparent', 'true');
-            outerPyramid.setAttribute('opacity', '0.2');
-            outerPyramid.setAttribute('wireframe', 'true');
-            outerPyramid.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000');
-
-            // Кільця
+            // Кільця (залишаємо, але робимо тоншими)
             const ring1 = document.createElement('a-cylinder');
-            ring1.setAttribute('radius', '1.8');
-            ring1.setAttribute('height', '0.1');
-            ring1.setAttribute('position', '0 0.5 0');
+            ring1.setAttribute('radius', '1.6');
+            ring1.setAttribute('height', '0.05');
+            ring1.setAttribute('position', '0 0.4 0');
             ring1.setAttribute('color', '#ff00ff');
             ring1.setAttribute('transparent', 'true');
-            ring1.setAttribute('opacity', '0.4');
-            ring1.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 8000');
+            ring1.setAttribute('opacity', '0.3');
+            ring1.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 9000');
 
             const ring2 = document.createElement('a-cylinder');
-            ring2.setAttribute('radius', '1.8');
-            ring2.setAttribute('height', '0.1');
-            ring2.setAttribute('position', '0 -0.5 0');
-            ring2.setAttribute('color', '#00ff00');
+            ring2.setAttribute('radius', '1.6');
+            ring2.setAttribute('height', '0.05');
+            ring2.setAttribute('position', '0 -0.4 0');
+            ring2.setAttribute('color', '#00ffff');
             ring2.setAttribute('transparent', 'true');
-            ring2.setAttribute('opacity', '0.4');
-            ring2.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 8000');
+            ring2.setAttribute('opacity', '0.3');
+            ring2.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 9000');
 
-            target.appendChild(sphere);
+            // ЗБЕРІГАЄМО ТІЛЬКИ ЦІ ЕЛЕМЕНТИ:
+            target.appendChild(glassShell);
+            target.appendChild(innerGlow);
             target.appendChild(innerCube);
-            target.appendChild(outerPyramid);
             target.appendChild(ring1);
             target.appendChild(ring2);
             scene.appendChild(target);
 
-            // Початковий текст
-            const startText = document.createElement('a-text');
-            startText.setAttribute('value', 'Натисни на кулю!');
-            startText.setAttribute('position', '0 -0.2 1');
-            startText.setAttribute('color', '#FFD700');
-            startText.setAttribute('align', 'center');
-            startText.setAttribute('width', '3');
-            startText.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
-            target.appendChild(startText);
+            // Початковий підказковий текст
+            const hint = document.createElement('a-text');
+            hint.setAttribute('value', 'Торкнись кулі!');
+            hint.setAttribute('position', '0 -0.3 1');
+            hint.setAttribute('color', '#FFD700');
+            hint.setAttribute('align', 'center');
+            hint.setAttribute('width', '3');
+            hint.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
+            target.appendChild(hint);
 
-            // Обробник кліку
+            // Обробник кліку — тепер на будь-який дочірній елемент
             function addClickHandler(element) {
                 element.addEventListener('click', function () {
                     if (isSoundOn) {
@@ -445,27 +407,20 @@
                         clickSound.volume = 0.3;
                         clickSound.play().catch(e => console.log("Click sound failed:", e));
                     }
-
-                    // Запускаємо магічний ефект
-                    createMagicEffect(target);
-
-                    // Можна також змінити колір кулі на секунду
-                    const originalColor = sphere.getAttribute('color');
-                    sphere.setAttribute('color', '#ffff00');
-                    setTimeout(() => {
-                        sphere.setAttribute('color', originalColor);
-                    }, 500);
+                    createMagicSign(target); // Знак "!" з'являється
                 });
             }
 
-            [sphere, innerCube, outerPyramid, ring1, ring2].forEach(addClickHandler);
+            // Додаємо обробник до ВСІХ кликабельних частин
+            [glassShell, innerGlow, innerCube, ring1, ring2, hint].forEach(el => {
+                el.setAttribute('cursor-listener', ''); // A-Frame потребує цього для mouse-ray
+                addClickHandler(el);
+            });
 
-            // Заміна контейнера
             const arContainer = document.getElementById('ar-scene');
             arContainer.innerHTML = '';
             arContainer.appendChild(scene);
 
-            // Ховаємо HTML-текст під час AR
             document.getElementById('current-wish').style.display = 'none';
 
             if (isSoundOn) {
@@ -483,7 +438,7 @@
             `;
             const wishDisplay = document.getElementById('current-wish');
             wishDisplay.style.display = 'flex';
-            wishDisplay.textContent = 'Натисни на магічну кулю, щоб активувати магію!';
+            wishDisplay.textContent = 'Торкнись магічної кулі, щоб побачити знак магії!';
             audio.pause();
         }
 
