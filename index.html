@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Різдвяна Магічна Куля</title>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-face.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script>
+    <!-- ПРАВИЛЬНИЙ ПОРЯДОК: спочатку A-Frame, потім MindAR -->
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    <!-- Видаляємо непотрібні скрипти -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-face.prod.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script> -->
     <style>
         * {
             margin: 0;
@@ -310,7 +312,7 @@
             }
         }
 
-        // AR сцена з можливістю переміщення
+        // Спрощена AR сцена без джойстика
         function startAR() {
             const scene = document.createElement('a-scene');
             currentScene = scene;
@@ -326,30 +328,20 @@
             scene.setAttribute('renderer', 'colorManagement: true, physicallyCorrectLights');
             scene.setAttribute('cursor', 'rayOrigin: mouse');
 
-            // КАМЕРА З МОЖЛИВІСТЮ ПЕРЕМІЩЕННЯ
+            // Спрощена камера
             const camera = document.createElement('a-camera');
-            camera.setAttribute('position', '0 1.6 3');
-            camera.setAttribute('wasd-controls', 'enabled: true; acceleration: 20');
-            camera.setAttribute('look-controls', 'enabled: true');
-            camera.setAttribute('cursor', 'rayOrigin: mouse');
+            camera.setAttribute('position', '0 1.6 0');
+            camera.setAttribute('look-controls', 'enabled: false');
             scene.appendChild(camera);
 
-            // ДЖОЙСТИК ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ
-            const joystick = document.createElement('a-entity');
-            joystick.setAttribute('movement-joystick', '');
-            joystick.setAttribute('position', '0 -1 -1');
-            camera.appendChild(joystick);
-
-            // СТВОРЮЄМО МАГІЧНУ КУЛЮ НА ПІДЛОЗІ
+            // Створюємо магічну кулю
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
-            target.setAttribute('position', '0 0 0');
-            target.setAttribute('scale', '0.8 0.8 0.8');
 
             // ОСНОВНА КУЛЯ (сфера)
             const sphere = document.createElement('a-sphere');
             sphere.setAttribute('radius', '0.8');
-            sphere.setAttribute('position', '0 0.8 0');
+            sphere.setAttribute('position', '0 0 0');
             sphere.setAttribute('color', '#ff0080');
             sphere.setAttribute('transparent', 'true');
             sphere.setAttribute('opacity', '0.8');
@@ -360,7 +352,7 @@
             innerCube.setAttribute('width', '1');
             innerCube.setAttribute('height', '1');
             innerCube.setAttribute('depth', '1');
-            innerCube.setAttribute('position', '0 0.8 0');
+            innerCube.setAttribute('position', '0 0 0');
             innerCube.setAttribute('color', '#00ffff');
             innerCube.setAttribute('transparent', 'true');
             innerCube.setAttribute('opacity', '0.3');
@@ -372,47 +364,17 @@
             outerPyramid.setAttribute('radius-bottom', '1.2');
             outerPyramid.setAttribute('radius-top', '0.1');
             outerPyramid.setAttribute('height', '1.5');
-            outerPyramid.setAttribute('position', '0 0.8 0');
+            outerPyramid.setAttribute('position', '0 0 0');
             outerPyramid.setAttribute('color', '#ffff00');
             outerPyramid.setAttribute('transparent', 'true');
             outerPyramid.setAttribute('opacity', '0.2');
             outerPyramid.setAttribute('wireframe', 'true');
             outerPyramid.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000');
 
-            // КІЛЬЦЯ НАВКОЛО
-            const ring1 = document.createElement('a-cylinder');
-            ring1.setAttribute('radius', '1.4');
-            ring1.setAttribute('height', '0.05');
-            ring1.setAttribute('position', '0 1.3 0');
-            ring1.setAttribute('color', '#ff00ff');
-            ring1.setAttribute('transparent', 'true');
-            ring1.setAttribute('opacity', '0.4');
-            ring1.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 8000');
-
-            const ring2 = document.createElement('a-cylinder');
-            ring2.setAttribute('radius', '1.4');
-            ring2.setAttribute('height', '0.05');
-            ring2.setAttribute('position', '0 0.3 0');
-            ring2.setAttribute('color', '#00ff00');
-            ring2.setAttribute('transparent', 'true');
-            ring2.setAttribute('opacity', '0.4');
-            ring2.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 8000');
-
-            // ПІДСТАВА ПІД КУЛЕЮ
-            const base = document.createElement('a-cylinder');
-            base.setAttribute('radius', '0.5');
-            base.setAttribute('height', '0.1');
-            base.setAttribute('position', '0 0 0');
-            base.setAttribute('color', '#8B4513');
-            base.setAttribute('roughness', '0.8');
-
             // Додаємо всі елементи
-            target.appendChild(base);
             target.appendChild(sphere);
             target.appendChild(innerCube);
             target.appendChild(outerPyramid);
-            target.appendChild(ring1);
-            target.appendChild(ring2);
             scene.appendChild(target);
 
             // ФУНКЦІЯ ДЛЯ СТВОРЕННЯ ТЕКСТУ
@@ -428,14 +390,14 @@
                 wishText3D.setAttribute('value', wishText);
                 wishText3D.setAttribute('color', '#FFD700');
                 wishText3D.setAttribute('align', 'center');
-                wishText3D.setAttribute('position', '0 2 0');
-                wishText3D.setAttribute('width', '3');
-                wishText3D.setAttribute('animation', 'property: position; to: 0 2.3 0; loop: true; dir: alternate; dur: 2000');
+                wishText3D.setAttribute('position', '0 1.5 0');
+                wishText3D.setAttribute('width', '2.5');
+                wishText3D.setAttribute('animation', 'property: position; to: 0 1.8 0; loop: true; dir: alternate; dur: 2000');
                 
                 const textBackground = document.createElement('a-plane');
-                textBackground.setAttribute('position', '0 2 0');
-                textBackground.setAttribute('width', '3.2');
-                textBackground.setAttribute('height', '0.8');
+                textBackground.setAttribute('position', '0 1.5 0');
+                textBackground.setAttribute('width', '2.7');
+                textBackground.setAttribute('height', '0.7');
                 textBackground.setAttribute('color', '#000000');
                 textBackground.setAttribute('opacity', '0.7');
                 
@@ -495,4 +457,3 @@
     </script>
 </body>
 </html>
-
