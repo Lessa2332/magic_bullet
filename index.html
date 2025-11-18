@@ -10,7 +10,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
             width: 100%; height: 100%; overflow: hidden;
-            background: linear-gradient(45deg, #1e3c72, #2a5298); /* Градієнтний фон на випадок помилок */
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
             font-family: Arial, sans-serif;
         }
         a-scene {
@@ -71,7 +71,7 @@
                     roughness: 0.3;
                     side: double
                 "
-                visible="true" <!-- Завжди видно на десктопі -->
+                visible="true"
             >
                 <a-animation
                     attribute="rotation"
@@ -105,7 +105,7 @@
                 width="4"
                 align="center"
                 font="kelsonsans"
-                visible="false" <!-- Ховаємо на мобільному -->
+                visible="false"
             ></a-text>
         </a-entity>
         <!-- Лоадер тільки для мобільного -->
@@ -127,7 +127,7 @@
         const scene = document.querySelector('a-scene');
         let isTargetActive = false;
         let isMobileAR = false;
-        let prophecyActive = false; // Для уникнення спаму
+        let prophecyActive = false;
         
         const prophecies = [
             "Щасливого Різдва!",
@@ -143,7 +143,7 @@
             console.log("🖥️ Десктоп: Увімкнено webcam + fallback");
             loader.setAttribute('visible', 'false');
             sphere.setAttribute('visible', 'true');
-            testText.setAttribute('visible', 'true'); // Показуємо тест-текст
+            testText.setAttribute('visible', 'true');
             isTargetActive = true;
 
             // Запит веб-камери для фону
@@ -151,14 +151,13 @@
                 .then(stream => {
                     webcamVideo.srcObject = stream;
                     webcamVideo.onloadedmetadata = () => {
-                        // Відео як фон сцени
                         sceneBg.setAttribute('material', 'src: #webcam-video; shader: flat; side: back');
                         console.log("✅ Webcam активна як фон!");
                     };
                 })
                 .catch(err => {
                     console.warn("⚠️ Webcam не дозволена — градієнтний фон:", err);
-                    sceneBg.setAttribute('color', '#1e3c72'); // Fallback колір
+                    sceneBg.setAttribute('color', '#1e3c72');
                 });
         }
 
@@ -175,7 +174,7 @@
 
         // Функція пророцтва
         function showProphecy() {
-            if (prophecyActive) return; // Уникаємо спаму
+            if (prophecyActive) return;
             prophecyActive = true;
             console.log("✨ showProphecy викликано!");
 
@@ -228,7 +227,7 @@
                 setTimeout(() => {
                     particles.setAttribute('visible', 'false');
                     particles.setAttribute('animation__particles', null);
-                    prophecyActive = false; // Дозволяємо наступне
+                    prophecyActive = false;
                 }, 1000);
             }, 5000);
         }
@@ -265,13 +264,14 @@
             }
         });
 
-        // Клік/тач по всьому екрану (fallback для десктопу/мобільного)
+        // ✅ ВИПРАВЛЕНО: Клік/тач по всьому екрану
         document.body.addEventListener('click', (e) => {
             if (!e.target.closest('#sound-btn') && (isTargetActive || !isMobileAR)) {
                 e.preventDefault();
-                showProp Prophecy();
+                showProphecy(); // 👈 ТЕПЕР ПРАВИЛЬНО
             }
         });
+        
         document.body.addEventListener('touchstart', (e) => {
             if (!e.target.closest('#sound-btn') && (isTargetActive || !isMobileAR)) {
                 e.preventDefault();
