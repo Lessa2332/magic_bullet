@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -147,21 +148,35 @@
             font-size: 1.5em;
         }
 
-        .snowflakes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
-        .snowflake {
-            position: absolute;
-            color: #fff;
-            font-size: 1.5em;
-            animation: fall linear infinite;
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff0080, #00ffff);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+        }
+
+        .movement-instructions {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
         }
 
         @keyframes glow {
@@ -181,43 +196,13 @@
                 transform: translateY(-10px);
             }
         }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-            }
-        }
-
-        .control-panel {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            background: linear-gradient(45deg, #ff0080, #00ffff);
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.3s ease;
-        }
-
-        .btn:hover {
-            transform: scale(1.1);
-        }
     </style>
 </head>
 <body>
-    <div class="snowflakes" id="snowflakes"></div>
-    
     <div class="container">
         <header class="header">
             <h1 class="title">🎄 Різдвяна Магічна Куля ✨</h1>
-            <p class="subtitle">Скануй маркер та відкрий чарівний світ різдвяних побажань!</p>
+            <p class="subtitle">Поклади маркер на підлогу та обіди магічну кулю навколо!</p>
         </header>
 
         <div class="content">
@@ -228,30 +213,42 @@
                         <p>Будь ласка, дай доступ до камери</p>
                     </div>
                 </div>
+                
+                <div class="movement-instructions">
+                    <p>🎮 <strong>Керування:</strong></p>
+                    <p>📱 <strong>Мобільний:</strong> Нахиляй пристрій для переміщення</p>
+                    <p>💻 <strong>Комп'ютер:</strong> Клавіші W,A,S,D для руху</p>
+                </div>
+                
                 <div class="control-panel">
                     <button class="btn" onclick="startAR()">▶️ Старт AR</button>
                     <button class="btn" onclick="stopAR()">⏹️ Стоп AR</button>
                     <button class="btn" onclick="toggleSound()">🔊 Звук</button>
+                    <button class="btn" onclick="resetPosition()">🔄 Скинути позицію</button>
                 </div>
             </div>
 
             <div class="instructions">
-                <h2>📖 Як грати:</h2>
+                <h2>📖 Як досліджувати кулю:</h2>
                 <div class="step">
                     <div class="step-number">1</div>
-                    <p>Натисни "Старт AR" та дай дозвіл на використання камери</p>
+                    <p>Поклади маркер на рівну поверхню підлоги</p>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
-                    <p>Наведи камеру на маркер (marker.mind)</p>
+                    <p>Наведи камеру на маркер зверху</p>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <p>Дивись, як з'являється магічна куля з побажаннями!</p>
+                    <p>Підійди ближче - куля збільшиться</p>
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <p>Натискай на кулю, щоб почути різдвяні побажання</p>
+                    <p>Обіди навколо - побач кулю з усіх боків!</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <p>Натисни на кулю - отримай різдвяне побажання</p>
                 </div>
             </div>
         </div>
@@ -279,27 +276,20 @@
     </div>
 
     <script>
-        // Створення сніжинок
-        function createSnowflakes() {
-            const snowflakesContainer = document.getElementById('snowflakes');
-            const snowflakes = ['❄️', '✨', '⭐', '💫', '🔸'];
-            
-            for (let i = 0; i < 50; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.className = 'snowflake';
-                snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
-                snowflake.style.left = Math.random() * 100 + 'vw';
-                snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
-                snowflake.style.animationDelay = Math.random() * 5 + 's';
-                snowflake.style.opacity = Math.random() * 0.7 + 0.3;
-                snowflakesContainer.appendChild(snowflake);
-            }
-        }
+        // Масив побажань
+        const wishes = [
+            "Нехай цього Різдва твої очі сяють від радощів, а серце наповниться дивуванням від кожного святкового моменту!",
+            "Бажаю, щоб під ялинкою тебе чекали найчарівніші подарунки, а Дід Мороз приніс мрії, які збуваються!",
+            "Хай різдвяна зірка освітить твій шлях до цікавих пригод і нових друзів у наступному році!",
+            "Нехай кожна сніжинка принесе тобі трохи магії, а кожна різдвяна пісня навчить співати від щастя!",
+            "Бажаю, щоб ці свята наповнили твій дім сміхом, теплом родини та ароматом домашніх печив!"
+        ];
 
         // Аудіо менеджер
         const audio = new Audio('fon.mp3');
         audio.loop = true;
         let isSoundOn = true;
+        let currentScene = null;
 
         function toggleSound() {
             isSoundOn = !isSoundOn;
@@ -310,9 +300,21 @@
             }
         }
 
-        // AR сцена
+        function resetPosition() {
+            if (currentScene) {
+                const camera = currentScene.querySelector('a-camera');
+                if (camera) {
+                    camera.setAttribute('position', '0 1.6 0');
+                    camera.setAttribute('rotation', '0 0 0');
+                }
+            }
+        }
+
+        // AR сцена з можливістю переміщення
         function startAR() {
             const scene = document.createElement('a-scene');
+            currentScene = scene;
+            
             scene.setAttribute('mindar-image', {
                 imageTargetSrc: 'assets/marker.mind',
                 maxTrack: 1,
@@ -324,158 +326,156 @@
             scene.setAttribute('renderer', 'colorManagement: true, physicallyCorrectLights');
             scene.setAttribute('cursor', 'rayOrigin: mouse');
 
-            // Додаємо камеру
+            // КАМЕРА З МОЖЛИВІСТЮ ПЕРЕМІЩЕННЯ
             const camera = document.createElement('a-camera');
-            camera.setAttribute('position', '0 0 0');
-            camera.setAttribute('look-controls', 'enabled: false');
+            camera.setAttribute('position', '0 1.6 3');
+            camera.setAttribute('wasd-controls', 'enabled: true; acceleration: 20');
+            camera.setAttribute('look-controls', 'enabled: true');
+            camera.setAttribute('cursor', 'rayOrigin: mouse');
             scene.appendChild(camera);
 
-            // Створюємо магічну кулю з ПРИМІТИВІВ
+            // ДЖОЙСТИК ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ
+            const joystick = document.createElement('a-entity');
+            joystick.setAttribute('movement-joystick', '');
+            joystick.setAttribute('position', '0 -1 -1');
+            camera.appendChild(joystick);
+
+            // СТВОРЮЄМО МАГІЧНУ КУЛЮ НА ПІДЛОЗІ
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
+            target.setAttribute('position', '0 0 0');
+            target.setAttribute('scale', '0.8 0.8 0.8');
 
-            // ОСНОВНА КУЛЯ (сфера - примітив)
+            // ОСНОВНА КУЛЯ (сфера)
             const sphere = document.createElement('a-sphere');
-            sphere.setAttribute('radius', '1');
-            sphere.setAttribute('position', '0 0 0');
+            sphere.setAttribute('radius', '0.8');
+            sphere.setAttribute('position', '0 0.8 0');
             sphere.setAttribute('color', '#ff0080');
             sphere.setAttribute('transparent', 'true');
             sphere.setAttribute('opacity', '0.8');
             sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000');
 
-            // ВНУТРІШНЯ КУБІЧНА СТРУКТУРА (примітив - box)
+            // ВНУТРІШНЯ СТРУКТУРА
             const innerCube = document.createElement('a-box');
-            innerCube.setAttribute('width', '1.2');
-            innerCube.setAttribute('height', '1.2');
-            innerCube.setAttribute('depth', '1.2');
-            innerCube.setAttribute('position', '0 0 0');
+            innerCube.setAttribute('width', '1');
+            innerCube.setAttribute('height', '1');
+            innerCube.setAttribute('depth', '1');
+            innerCube.setAttribute('position', '0 0.8 0');
             innerCube.setAttribute('color', '#00ffff');
             innerCube.setAttribute('transparent', 'true');
             innerCube.setAttribute('opacity', '0.3');
             innerCube.setAttribute('wireframe', 'true');
             innerCube.setAttribute('animation', 'property: rotation; to: 360 360 360; loop: true; dur: 15000');
 
-            // ЗОВНІШНЯ ПІРАМІДА (примітив - cone)
+            // ЗОВНІШНЯ ПІРАМІДА
             const outerPyramid = document.createElement('a-cone');
-            outerPyramid.setAttribute('radius-bottom', '1.5');
+            outerPyramid.setAttribute('radius-bottom', '1.2');
             outerPyramid.setAttribute('radius-top', '0.1');
-            outerPyramid.setAttribute('height', '2');
-            outerPyramid.setAttribute('position', '0 0 0');
+            outerPyramid.setAttribute('height', '1.5');
+            outerPyramid.setAttribute('position', '0 0.8 0');
             outerPyramid.setAttribute('color', '#ffff00');
             outerPyramid.setAttribute('transparent', 'true');
             outerPyramid.setAttribute('opacity', '0.2');
             outerPyramid.setAttribute('wireframe', 'true');
             outerPyramid.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000');
 
-            // ЦИЛІНДРИ НАВКОЛО (примітив - cylinder)
+            // КІЛЬЦЯ НАВКОЛО
             const ring1 = document.createElement('a-cylinder');
-            ring1.setAttribute('radius', '1.8');
-            ring1.setAttribute('height', '0.1');
-            ring1.setAttribute('position', '0 0.5 0');
+            ring1.setAttribute('radius', '1.4');
+            ring1.setAttribute('height', '0.05');
+            ring1.setAttribute('position', '0 1.3 0');
             ring1.setAttribute('color', '#ff00ff');
             ring1.setAttribute('transparent', 'true');
             ring1.setAttribute('opacity', '0.4');
             ring1.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 8000');
 
             const ring2 = document.createElement('a-cylinder');
-            ring2.setAttribute('radius', '1.8');
-            ring2.setAttribute('height', '0.1');
-            ring2.setAttribute('position', '0 -0.5 0');
+            ring2.setAttribute('radius', '1.4');
+            ring2.setAttribute('height', '0.05');
+            ring2.setAttribute('position', '0 0.3 0');
             ring2.setAttribute('color', '#00ff00');
             ring2.setAttribute('transparent', 'true');
             ring2.setAttribute('opacity', '0.4');
             ring2.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 8000');
 
-            // ПЛОСКІ ФІГУРИ (примітив - plane) - різдвяні символи
-            const star = document.createElement('a-plane');
-            star.setAttribute('width', '0.3');
-            star.setAttribute('height', '0.3');
-            star.setAttribute('position', '1.5 0 0');
-            star.setAttribute('color', '#FFD700');
-            star.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 4000');
+            // ПІДСТАВА ПІД КУЛЕЮ
+            const base = document.createElement('a-cylinder');
+            base.setAttribute('radius', '0.5');
+            base.setAttribute('height', '0.1');
+            base.setAttribute('position', '0 0 0');
+            base.setAttribute('color', '#8B4513');
+            base.setAttribute('roughness', '0.8');
 
-            const heart = document.createElement('a-plane');
-            heart.setAttribute('width', '0.3');
-            heart.setAttribute('height', '0.3');
-            heart.setAttribute('position', '0 1.5 0');
-            heart.setAttribute('color', '#FF1493');
-            heart.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 5000');
-
-            // ТОР (примітив - torus) - додаткова геометрія
-            const torus = document.createElement('a-torus');
-            torus.setAttribute('radius', '1.3');
-            torus.setAttribute('radius-tubular', '0.05');
-            torus.setAttribute('position', '0 0 0');
-            torus.setAttribute('color', '#4B0082');
-            torus.setAttribute('animation', 'property: rotation; to: 0 360 360; loop: true; dur: 10000');
-
-            // ОСТАННІЙ ПРИМІТИВ - octahedron
-            const octahedron = document.createElement('a-octahedron');
-            octahedron.setAttribute('radius', '0.8');
-            octahedron.setAttribute('position', '0 0 0');
-            octahedron.setAttribute('color', '#FF4500');
-            octahedron.setAttribute('transparent', 'true');
-            octahedron.setAttribute('opacity', '0.5');
-            octahedron.setAttribute('wireframe', 'true');
-            octahedron.setAttribute('animation', 'property: rotation; to: 360 360 0; loop: true; dur: 13000');
-
-            // Додаємо всі примітиви до цілі
+            // Додаємо всі елементи
+            target.appendChild(base);
             target.appendChild(sphere);
             target.appendChild(innerCube);
             target.appendChild(outerPyramid);
             target.appendChild(ring1);
             target.appendChild(ring2);
-            target.appendChild(star);
-            target.appendChild(heart);
-            target.appendChild(torus);
-            target.appendChild(octahedron);
             scene.appendChild(target);
 
-            // Обробник кліку на будь-який примітив
+            // ФУНКЦІЯ ДЛЯ СТВОРЕННЯ ТЕКСТУ
+            let currentWishIndex = 0;
+            let wishText3D = null;
+
+            function createWishText(wishText) {
+                if (wishText3D) {
+                    target.removeChild(wishText3D);
+                }
+
+                wishText3D = document.createElement('a-text');
+                wishText3D.setAttribute('value', wishText);
+                wishText3D.setAttribute('color', '#FFD700');
+                wishText3D.setAttribute('align', 'center');
+                wishText3D.setAttribute('position', '0 2 0');
+                wishText3D.setAttribute('width', '3');
+                wishText3D.setAttribute('animation', 'property: position; to: 0 2.3 0; loop: true; dir: alternate; dur: 2000');
+                
+                const textBackground = document.createElement('a-plane');
+                textBackground.setAttribute('position', '0 2 0');
+                textBackground.setAttribute('width', '3.2');
+                textBackground.setAttribute('height', '0.8');
+                textBackground.setAttribute('color', '#000000');
+                textBackground.setAttribute('opacity', '0.7');
+                
+                target.appendChild(textBackground);
+                target.appendChild(wishText3D);
+            }
+
+            // ОБРОБНИКИ КЛІКУ
             function addClickHandler(element) {
                 element.addEventListener('click', function() {
-                    // Анімація при кліку
                     element.setAttribute('animation', {
                         property: 'scale',
-                        to: '1.3 1.3 1.3',
+                        to: '1.2 1.2 1.2',
                         dur: 300,
                         dir: 'alternate'
                     });
 
-                    // Відтворюємо звук
                     if (isSoundOn) {
                         const clickSound = new Audio('fon.mp3');
                         clickSound.volume = 0.3;
                         clickSound.play();
                     }
 
-                    // Випадкове побажання
-                    const wishes = document.querySelectorAll('.wish-item');
-                    const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
-                    
-                    // Підсвічуємо вибране побажання
-                    wishes.forEach(w => w.style.background = 'rgba(255, 255, 255, 0.1)');
-                    randomWish.style.background = 'linear-gradient(45deg, rgba(255, 215, 0, 0.4), rgba(255, 0, 128, 0.4))';
+                    currentWishIndex = (currentWishIndex + 1) % wishes.length;
+                    createWishText(wishes[currentWishIndex]);
                 });
             }
 
-            // Додаємо обробники кліку до всіх примітивів
             addClickHandler(sphere);
             addClickHandler(innerCube);
             addClickHandler(outerPyramid);
-            addClickHandler(ring1);
-            addClickHandler(ring2);
-            addClickHandler(star);
-            addClickHandler(heart);
-            addClickHandler(torus);
-            addClickHandler(octahedron);
 
-            // Замінюємо контейнер AR сценою
+            // ПОЧАТКОВИЙ ТЕКСТ
+            createWishText("Натисни на кулю!");
+
+            // ЗАМІНА СЦЕНИ
             const arContainer = document.getElementById('ar-scene');
             arContainer.innerHTML = '';
             arContainer.appendChild(scene);
 
-            // Запускаємо звук
             if (isSoundOn) {
                 audio.play();
             }
@@ -487,10 +487,12 @@
             audio.pause();
         }
 
-        // Ініціалізація
+        // ІНІЦІАЛІЗАЦІЯ
         document.addEventListener('DOMContentLoaded', function() {
-            createSnowflakes();
+            // Автоматичний старт при завантаженні (опційно)
+            // startAR();
         });
     </script>
 </body>
 </html>
+
