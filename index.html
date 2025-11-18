@@ -119,25 +119,7 @@
         }
 
         .wishes {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .wish-item {
-            background: linear-gradient(45deg, rgba(255, 0, 128, 0.3), rgba(0, 255, 255, 0.3));
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            border-left: 5px solid #ff0080;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .wish-item:nth-child(even) {
-            animation-delay: 1.5s;
-            border-left-color: #00ffff;
+            display: none; /* Прибираємо текстові побажання */
         }
 
         .loading {
@@ -241,7 +223,7 @@
                     </div>
                 </div>
                 <div class="current-wish" id="current-wish">
-                    Натисни на магічну кулю, щоб побачити побажання!
+                    Натисни на магічну кулю, щоб активувати магію!
                 </div>
                 <div class="control-panel">
                     <button class="btn" onclick="startAR()">▶️ Старт AR</button>
@@ -262,46 +244,27 @@
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <p>Дивись, як з'являється магічна куля з побажаннями!</p>
+                    <p>Дивись, як з'являється магічна куля!</p>
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <p>Натискай на кулю, щоб побачити різдвяні побажання в 3D!</p>
+                    <p>Натискай на кулю — і вона подарує тобі магічний ефект!</p>
                 </div>
             </div>
         </div>
 
-        <div class="wishes">
+        <!-- ВИКЛЮЧАЄМО БЛОК ПОБАЖАНЬ -->
+        <!-- <div class="wishes">
             <h2 style="text-align: center; color: #ffeb3b; margin-bottom: 20px;">
                 🌟 Різдвяні Побажання для Тебе!
             </h2>
-            <div class="wish-item">
-                <p>Нехай цього Різдва твої очі сяють від радощів, а серце наповниться дивуванням від кожного святкового моменту!</p>
-            </div>
-            <div class="wish-item">
-                <p>Бажаю, щоб під ялинкою тебе чекали найчарівніші подарунки, а Дід Мороз приніс мрії, які збуваються!</p>
-            </div>
-            <div class="wish-item">
-                <p>Хай різдвяна зірка освітить твій шлях до цікавих пригод і нових друзів у наступному році!</p>
-            </div>
-            <div class="wish-item">
-                <p>Нехай кожна сніжинка принесе тобі трохи магії, а кожна різдвяна пісня навчить співати від щастя!</p>
-            </div>
-            <div class="wish-item">
-                <p>Бажаю, щоб ці свята наповнили твій дім сміхом, теплом родини та ароматом домашніх печив!</p>
-            </div>
-        </div>
+            ... (текст видалено)
+        </div> -->
+
     </div>
 
     <script>
-        const wishes = [
-            "Нехай цього Різдва твої очі сяють від радощів, а серце наповниться дивуванням від кожного святкового моменту!",
-            "Бажаю, щоб під ялинкою тебе чекали найчарівніші подарунки, а Дід Мороз приніс мрії, які збуваються!",
-            "Хай різдвяна зірка освітить твій шлях до цікавих пригод і нових друзів у наступному році!",
-            "Нехай кожна сніжинка принесе тобі трохи магії, а кожна різдвяна пісня навчить співати від щастя!",
-            "Бажаю, щоб ці свята наповнили твій дім сміхом, теплом родини та ароматом домашніх печив!"
-        ];
-
+        // Створення сніжинок
         function createSnowflakes() {
             const snowflakesContainer = document.getElementById('snowflakes');
             const snowflakes = ['❄️', '✨', '⭐', '💫', '🔸'];
@@ -317,6 +280,7 @@
             }
         }
 
+        // Аудіо менеджер
         const audio = new Audio('fon.mp3');
         audio.loop = true;
         let isSoundOn = true;
@@ -330,51 +294,59 @@
             }
         }
 
-        let currentWishIndex = 0;
-        let wishText3D = null;
-        let wishShadow = null;
+        // Функція для створення магічного ефекту (іскри / сніжинки / спалах)
+        function createMagicEffect(parent) {
+            // Створюємо "спалах"
+            const flash = document.createElement('a-sphere');
+            flash.setAttribute('radius', '1.3');
+            flash.setAttribute('material', 'shader: flat; color: #ff00ff; transparent: true; opacity: 0.7');
+            flash.setAttribute('animation', 'property: opacity; to: 0; dur: 800; easing: easeOutQuad');
+            flash.setAttribute('animation__scale', 'property: scale; to: 2.5 2.5 2.5; dur: 800');
+            parent.appendChild(flash);
 
-        function createWishText(wishText, targetEntity) {
-            if (wishText3D) {
-                targetEntity.removeChild(wishText3D);
-                wishText3D = null;
+            // Додаємо іскри
+            for (let i = 0; i < 8; i++) {
+                const spark = document.createElement('a-sphere');
+                const angle = (i / 8) * Math.PI * 2;
+                const x = Math.cos(angle) * 0.5;
+                const y = Math.sin(angle) * 0.5;
+                spark.setAttribute('radius', '0.05');
+                spark.setAttribute('position', `${x} ${y} 0`);
+                spark.setAttribute('color', '#ffff00');
+                spark.setAttribute('transparent', 'true');
+                spark.setAttribute('opacity', '0.8');
+                spark.setAttribute('animation', 'property: position; to: 0 0 0; dur: 800; easing: easeInCubic');
+                spark.setAttribute('animation__fade', 'property: opacity; to: 0; dur: 800; easing: easeInCubic');
+                parent.appendChild(spark);
+                setTimeout(() => {
+                    if (spark.parentNode) spark.parentNode.removeChild(spark);
+                }, 800);
             }
-            if (wishShadow) {
-                targetEntity.removeChild(wishShadow);
-                wishShadow = null;
+
+            // Додаємо сніжинки (якщо хочеш)
+            for (let i = 0; i < 5; i++) {
+                const snow = document.createElement('a-entity');
+                const angle = (i / 5) * Math.PI * 2;
+                const x = Math.cos(angle) * 0.7;
+                const y = Math.sin(angle) * 0.7;
+                snow.setAttribute('position', `${x} ${y} 0`);
+                snow.innerHTML = `
+                    <a-text value="❄️" color="#ffffff" width="0.5" align="center" position="0 0 0"></a-text>
+                `;
+                snow.setAttribute('animation', 'property: position; to: 0 0 0; dur: 1000; easing: easeInCubic');
+                snow.setAttribute('animation__fade', 'property: opacity; to: 0; dur: 1000; easing: easeInCubic');
+                parent.appendChild(snow);
+                setTimeout(() => {
+                    if (snow.parentNode) snow.parentNode.removeChild(snow);
+                }, 1000);
             }
-
-            wishShadow = document.createElement('a-text');
-            wishShadow.setAttribute('value', wishText);
-            wishShadow.setAttribute('position', '0.02 -0.22 1.02');
-            wishShadow.setAttribute('color', '#000');
-            wishShadow.setAttribute('opacity', '0.6');
-            wishShadow.setAttribute('width', '3');
-            wishShadow.setAttribute('align', 'center');
-            wishShadow.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
-            wishShadow.setAttribute('side', 'double');
-
-            wishText3D = document.createElement('a-text');
-            wishText3D.setAttribute('value', wishText);
-            wishText3D.setAttribute('position', '0 -0.2 1');
-            wishText3D.setAttribute('color', '#FFD700');
-            wishText3D.setAttribute('width', '3');
-            wishText3D.setAttribute('align', 'center');
-            wishText3D.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
-            wishText3D.setAttribute('side', 'double');
-            wishText3D.setAttribute('opacity', '0');
-            wishText3D.setAttribute('animation__fade', 'property: opacity; from: 0; to: 1; dur: 1200; easing: easeOutCubic');
-            wishText3D.setAttribute('animation__scale', 'property: scale; from: 0.7 0.7 0.7; to: 1 1 1; dur: 1200; easing: easeOutBack');
-
-            targetEntity.appendChild(wishShadow);
-            targetEntity.appendChild(wishText3D);
 
             setTimeout(() => {
-                if (wishText3D) wishText3D.emit('fadein');
-                if (wishShadow) wishShadow.emit('fadein');
-            }, 100);
+                if (flash.parentNode) flash.parentNode.removeChild(flash);
+            }, 800);
         }
 
+        // AR сцена
         function startAR() {
             const scene = document.createElement('a-scene');
             scene.setAttribute('mindar-image', {
@@ -396,6 +368,7 @@
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
+            // Основна куля
             const sphere = document.createElement('a-sphere');
             sphere.setAttribute('radius', '1');
             sphere.setAttribute('position', '0 0 0');
@@ -404,6 +377,7 @@
             sphere.setAttribute('opacity', '0.8');
             sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000');
 
+            // Внутрішній куб
             const innerCube = document.createElement('a-box');
             innerCube.setAttribute('width', '1.2');
             innerCube.setAttribute('height', '1.2');
@@ -415,6 +389,7 @@
             innerCube.setAttribute('wireframe', 'true');
             innerCube.setAttribute('animation', 'property: rotation; to: 360 360 360; loop: true; dur: 15000');
 
+            // Зовнішня піраміда
             const outerPyramid = document.createElement('a-cone');
             outerPyramid.setAttribute('radius-bottom', '1.5');
             outerPyramid.setAttribute('radius-top', '0.1');
@@ -426,6 +401,7 @@
             outerPyramid.setAttribute('wireframe', 'true');
             outerPyramid.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000');
 
+            // Кільця
             const ring1 = document.createElement('a-cylinder');
             ring1.setAttribute('radius', '1.8');
             ring1.setAttribute('height', '0.1');
@@ -451,41 +427,45 @@
             target.appendChild(ring2);
             scene.appendChild(target);
 
-            createWishText("Натисни на кулю для побажання!", target);
+            // Початковий текст
+            const startText = document.createElement('a-text');
+            startText.setAttribute('value', 'Натисни на кулю!');
+            startText.setAttribute('position', '0 -0.2 1');
+            startText.setAttribute('color', '#FFD700');
+            startText.setAttribute('align', 'center');
+            startText.setAttribute('width', '3');
+            startText.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
+            target.appendChild(startText);
 
-            function createMagicFlash(parent) {
-                const flash = document.createElement('a-sphere');
-                flash.setAttribute('radius', '1.3');
-                flash.setAttribute('material', 'shader: flat; color: #8a2be2; transparent: true; opacity: 0.7');
-                flash.setAttribute('animation', 'property: opacity; to: 0; dur: 800; easing: easeOutQuad');
-                flash.setAttribute('animation__scale', 'property: scale; to: 2.5 2.5 2.5; dur: 800');
-                parent.appendChild(flash);
-                setTimeout(() => {
-                    if (flash.parentNode) flash.parentNode.removeChild(flash);
-                }, 800);
-            }
-
+            // Обробник кліку
             function addClickHandler(element) {
                 element.addEventListener('click', function () {
-                    createMagicFlash(target);
-
                     if (isSoundOn) {
                         const clickSound = new Audio('fon.mp3');
                         clickSound.volume = 0.3;
                         clickSound.play().catch(e => console.log("Click sound failed:", e));
                     }
 
-                    currentWishIndex = (currentWishIndex + 1) % wishes.length;
-                    createWishText(wishes[currentWishIndex], target);
+                    // Запускаємо магічний ефект
+                    createMagicEffect(target);
+
+                    // Можна також змінити колір кулі на секунду
+                    const originalColor = sphere.getAttribute('color');
+                    sphere.setAttribute('color', '#ffff00');
+                    setTimeout(() => {
+                        sphere.setAttribute('color', originalColor);
+                    }, 500);
                 });
             }
 
             [sphere, innerCube, outerPyramid, ring1, ring2].forEach(addClickHandler);
 
+            // Заміна контейнера
             const arContainer = document.getElementById('ar-scene');
             arContainer.innerHTML = '';
             arContainer.appendChild(scene);
 
+            // Ховаємо HTML-текст під час AR
             document.getElementById('current-wish').style.display = 'none';
 
             if (isSoundOn) {
@@ -503,7 +483,7 @@
             `;
             const wishDisplay = document.getElementById('current-wish');
             wishDisplay.style.display = 'flex';
-            wishDisplay.textContent = 'Натисни на магічну кулю, щоб побачити побажання!';
+            wishDisplay.textContent = 'Натисни на магічну кулю, щоб активувати магію!';
             audio.pause();
         }
 
