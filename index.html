@@ -6,7 +6,6 @@
     <title>🎄 Різдвяна Магічна Куля</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-effects@1.0.0/dist/aframe-effects.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -42,7 +41,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(10, 15, 44, 0.95);
+            background: rgba(10, 15, 44, 0.8);
             z-index: 1000;
             text-align: center;
             padding: 20px;
@@ -79,26 +78,16 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 1em;
-            backdrop-filter: blur(10px);
-        }
-
-        .particles-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 999;
         }
     </style>
 </head>
 <body>
     <div class="loader" id="loader">
         <h1>🎄 Різдвяна Магічна Куля</h1>
-        <p>Наведи камеру на маркер, щоб побачити диво!</p>
+        <p>Наведи камеру на маркер!</p>
     </div>
 
+    <!-- Додано: cursor="rayOrigin: mouse" -->
     <a-scene
         mindar-image="imageTargetSrc: assets/marker.mind; maxTrack: 1"
         embedded
@@ -106,109 +95,35 @@
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false"
         loading-screen="enabled: false"
+        cursor="rayOrigin: mouse"  <!-- 🔑 ЦЕ ГОЛОВНЕ! -->
     >
         <a-assets>
             <audio id="bg-music" src="fon.mp3" preload="auto" loop></audio>
-            <img id="env-map" src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/sphere/cube_panorama.jpg" crossorigin="anonymous">
-            
-            <!-- Шейдери -->
-            <script id="vertexShader" type="x-shader/x-vertex">
-                varying vec3 vNormal;
-                varying vec3 vWorldPosition;
-                varying vec2 vUv;
-
-                void main() {
-                    vNormal = normalize(normalMatrix * normal);
-                    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-                    vWorldPosition = worldPosition.xyz;
-                    vUv = uv;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            </script>
-
-            <script id="fragmentShader" type="x-shader/x-fragment">
-                uniform float time;
-                uniform sampler2D envMap;
-                varying vec3 vNormal;
-                varying vec3 vWorldPosition;
-                varying vec2 vUv;
-
-                void main() {
-                    // Рефракція та відбиття
-                    vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
-                    vec3 normal = normalize(vNormal);
-                    
-                    // Дисторсія для скляного ефекту
-                    float distortion = sin(time + vWorldPosition.x * 3.0) * 0.1 + 
-                                      cos(time + vWorldPosition.y * 3.0) * 0.1;
-                    
-                    // Кольорові спалахи
-                    vec3 sparkles = vec3(
-                        sin(time * 2.0 + vWorldPosition.x * 10.0) * 0.3,
-                        cos(time * 1.5 + vWorldPosition.y * 8.0) * 0.3,
-                        sin(time * 1.8 + vWorldPosition.z * 6.0) * 0.3
-                    );
-                    
-                    // Основний колір з градієнтом
-                    vec3 baseColor = mix(vec3(0.1, 0.4, 0.8), vec3(0.8, 0.2, 0.6), vUv.y);
-                    
-                    // Френсель ефект
-                    float fresnel = pow(1.0 - dot(normal, viewDirection), 3.0);
-                    
-                    // Фінальний колір
-                    vec3 finalColor = baseColor + sparkles + fresnel * vec3(0.5, 0.8, 1.0);
-                    
-                    // Прозорість з варіаціями
-                    float alpha = 0.3 + fresnel * 0.3 + length(sparkles) * 0.2;
-                    
-                    gl_FragColor = vec4(finalColor, alpha);
-                }
-            </script>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <!-- Світло -->
-        <a-light type="ambient" color="#4455aa" intensity="0.3"></a-light>
-        <a-light type="directional" color="#ff4444" intensity="0.8" position="2 5 3"></a-light>
-        <a-light type="point" color="#4444ff" intensity="1.0" position="-3 2 1"></a-light>
-        <a-light type="point" color="#44ff44" intensity="0.6" position="1 -2 2"></a-light>
-
         <a-entity mindar-image-target="targetIndex: 0">
-            <!-- Магічна скляна куля з кастомним шейдером -->
-            <a-entity
+            <a-sphere
                 id="magic-sphere"
-                geometry="primitive: sphere; radius: 0.8"
-                position="0 0.5 0"
+                radius="0.8"
+                position="0 0 0"
+                material="
+                    color: #00b0ff;
+                    transparent: true;
+                    opacity: 0.35;
+                    shader: flat;
+                    side: double
+                "
                 visible="false"
-                class="clickable"
             >
-                <!-- Анімація плавного спливання -->
-                <a-animation
-                    attribute="position"
-                    from="0 -1 0"
-                    to="0 0.5 0"
-                    dur="2000"
-                    easing="easeOutElastic"
-                ></a-animation>
-                
-                <!-- Анімація обертання -->
                 <a-animation
                     attribute="rotation"
                     to="0 360 0"
-                    dur="15000"
+                    dur="8000"
                     repeat="indefinite"
-                    easing="linear"
                 ></a-animation>
-            </a-entity>
-
-            <!-- Частинки навколо кулі -->
-            <a-entity
-                id="particles"
-                particle-system="preset: snow; color: #00B0FF, #FF00FF; particleCount: 150"
-                position="0 0.5 0"
-                visible="false"
-            ></a-entity>
+            </a-sphere>
         </a-entity>
     </a-scene>
 
@@ -217,138 +132,81 @@
     <script>
         const loader = document.getElementById('loader');
         const sphere = document.getElementById('magic-sphere');
-        const particles = document.getElementById('particles');
         const bgMusic = document.getElementById('bg-music');
         const soundBtn = document.getElementById('sound-btn');
 
-        let scene, camera, renderer;
-        let customSphere, clock;
         let prophecyText = null;
+        let prophecyShadow = null;
 
-        // Ініціалізація кастомного шейдера
-        function initCustomShader() {
-            scene = document.querySelector('a-scene').object3D;
-            
-            const vertexShader = document.getElementById('vertexShader').textContent;
-            const fragmentShader = document.getElementById('fragmentShader').textContent;
-            
-            const uniforms = {
-                time: { value: 0 },
-                envMap: { value: null }
-            };
-            
-            const shaderMaterial = new THREE.ShaderMaterial({
-                vertexShader: vertexShader,
-                fragmentShader: fragmentShader,
-                uniforms: uniforms,
-                transparent: true,
-                side: THREE.DoubleSide,
-                blending: THREE.AdditiveBlending
-            });
-            
-            // Застосування матеріалу до сфери
-            sphere.addEventListener('model-loaded', () => {
-                const mesh = sphere.getObject3D('mesh');
-                if (mesh) {
-                    mesh.material = shaderMaterial;
-                    customSphere = mesh;
-                }
-            });
-            
-            clock = new THREE.Clock();
-            
-            // Анімація шейдера
-            function animateShader() {
-                if (customSphere && customSphere.material.uniforms.time) {
-                    customSphere.material.uniforms.time.value = clock.getElapsedTime();
-                }
-                requestAnimationFrame(animateShader);
-            }
-            animateShader();
-        }
-
-        // Покращена функція пророцтва
         function showProphecy() {
             const parent = sphere.parentNode;
-            
-            // Видаляємо старий текст
+
             if (prophecyText) {
                 parent.removeChild(prophecyText);
+                prophecyText = null;
+            }
+            if (prophecyShadow) {
+                parent.removeChild(prophecyShadow);
+                prophecyShadow = null;
             }
 
-            const messages = [
-                "Щасливого Різдва! 🎄",
-                "Мир та добро у вашому домі! ✨",
-                "Нехай ангели бережуть вас! 🌟",
-                "Любов і світло цілий рік! 💫"
-            ];
-            
-            const message = messages[Math.floor(Math.random() * messages.length)];
+            const message = "Щасливого Різдва!";
 
-            // Створення тексту з ефектами
-            prophecyText = document.createElement('a-entity');
-            prophecyText.setAttribute('position', '0 1.8 0');
-            prophecyText.setAttribute('text', {
-                value: message,
-                color: '#FFD700',
-                align: 'center',
-                width: 3,
-                font: 'https://cdn.aframe.io/fonts/Roboto-msdf.json'
-            });
+            prophecyShadow = document.createElement('a-text');
+            prophecyShadow.setAttribute('value', message);
+            prophecyShadow.setAttribute('position', '0 0 0.75');
+            prophecyShadow.setAttribute('color', '#000');
+            prophecyShadow.setAttribute('opacity', '0.6');
+            prophecyShadow.setAttribute('width', '2.6');
+            prophecyShadow.setAttribute('align', 'center');
+            prophecyShadow.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
 
-            // Анімація появи
-            prophecyText.setAttribute('animation', {
-                property: 'scale',
-                from: '0 0 0',
-                to: '1 1 1',
-                dur: 1000,
-                easing: 'easeOutElastic'
-            });
+            prophecyText = document.createElement('a-text');
+            prophecyText.setAttribute('value', message);
+            prophecyText.setAttribute('position', '0 0 0.75');
+            prophecyText.setAttribute('color', '#FFD700');
+            prophecyText.setAttribute('width', '2.6');
+            prophecyText.setAttribute('align', 'center');
+            prophecyText.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
+            prophecyText.setAttribute('opacity', '0');
+            prophecyText.setAttribute('animation__fade', 'property: opacity; from: 0; to: 1; dur: 1000; easing: easeOutCubic');
 
+            parent.appendChild(prophecyShadow);
             parent.appendChild(prophecyText);
 
-            // Ефект частинок при появі тексту
-            particles.emit('emit');
+            setTimeout(() => {
+                if (prophecyText) prophecyText.emit('fadein');
+            }, 100);
 
-            // Автоматичне зникнення
             setTimeout(() => {
                 if (prophecyText && prophecyText.parentNode) {
-                    prophecyText.setAttribute('animation', {
-                        property: 'scale',
-                        to: '0 0 0',
-                        dur: 800,
-                        easing: 'easeInCubic'
-                    });
+                    prophecyText.setAttribute('animation__out', 'property: opacity; to: 0; dur: 800; startEvents: fadeout');
+                    prophecyText.emit('fadeout');
                     setTimeout(() => {
-                        if (prophecyText.parentNode) {
-                            prophecyText.parentNode.removeChild(prophecyText);
-                            prophecyText = null;
-                        }
+                        if (prophecyText.parentNode) prophecyText.parentNode.removeChild(prophecyText);
+                        if (prophecyShadow.parentNode) prophecyShadow.parentNode.removeChild(prophecyShadow);
+                        prophecyText = null;
+                        prophecyShadow = null;
                     }, 800);
                 }
-            }, 5000);
+            }, 4000);
         }
 
-        // Обробка подій AR
+        // 🔥 ГОЛОВНЕ: обробка кліку через A-Frame подію
+        sphere.addEventListener('click', (evt) => {
+            evt.preventDefault();
+            evt.stopPropagation();
+            showProphecy();
+            console.log("Клік по кулі — пророцтво активовано!");
+        });
+
         const target = document.querySelector('[mindar-image-target]');
         if (target) {
             target.addEventListener('targetFound', () => {
                 loader.style.display = 'none';
                 sphere.setAttribute('visible', 'true');
-                particles.setAttribute('visible', 'true');
-                
-                // Ініціалізація шейдера після появи
-                setTimeout(initCustomShader, 100);
-                
-                // Автоплей звуку
                 if (bgMusic.paused) {
-                    const playPromise = bgMusic.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(e => {
-                            console.log("🔇 Автовідтворення заблоковано");
-                            soundBtn.style.display = 'block';
-                        });
-                    }
+                    bgMusic.play().catch(e => console.log("🔇 Audio play failed:", e));
                     soundBtn.textContent = '🔊 Вимкнути звук';
                 }
             });
@@ -356,63 +214,20 @@
             target.addEventListener('targetLost', () => {
                 loader.style.display = 'flex';
                 sphere.setAttribute('visible', 'false');
-                particles.setAttribute('visible', 'false');
                 if (!bgMusic.paused) bgMusic.pause();
                 soundBtn.textContent = '🔊 Увімкнути звук';
             });
         }
 
-        // Клік по кулі
-        sphere.addEventListener('click', showProphecy);
-
-        // Кнопка звуку
         soundBtn.addEventListener('click', () => {
             if (bgMusic.paused) {
-                bgMusic.play();
+                bgMusic.play().catch(e => console.log("🔇 Audio play failed:", e));
                 soundBtn.textContent = '🔊 Вимкнути звук';
             } else {
                 bgMusic.pause();
                 soundBtn.textContent = '🔊 Увімкнути звук';
             }
         });
-
-        // Додаткові ефекти при завантаженні
-        window.addEventListener('load', () => {
-            // Додаємо випадкові блимаючі зірочки на лоадер
-            createLoadingStars();
-        });
-
-        function createLoadingStars() {
-            const starsContainer = document.createElement('div');
-            starsContainer.className = 'particles-container';
-            document.body.appendChild(starsContainer);
-
-            for (let i = 0; i < 20; i++) {
-                const star = document.createElement('div');
-                star.style.cssText = `
-                    position: absolute;
-                    width: ${Math.random() * 4 + 2}px;
-                    height: ${Math.random() * 4 + 2}px;
-                    background: white;
-                    border-radius: 50%;
-                    left: ${Math.random() * 100}%;
-                    top: ${Math.random() * 100}%;
-                    animation: twinkle ${Math.random() * 3 + 2}s infinite alternate;
-                    box-shadow: 0 0 10px #00b0ff;
-                `;
-                starsContainer.appendChild(star);
-            }
-
-            // Додаємо CSS анімацію
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes twinkle {
-                    0% { opacity: 0.2; transform: scale(0.8); }
-                    100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 20px #ff00ff; }
-                }
-            `;
-            document.head.appendChild(style);
-        }
     </script>
 </body>
 </html>
