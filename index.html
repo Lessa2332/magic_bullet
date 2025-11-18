@@ -2,198 +2,236 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Magic Christmas Ball</title>
-    <!-- Стабільні версії -->
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.3/dist/mindar-image-aframe.prod.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Magic Ball</title>
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
-            background: linear-gradient(135deg, #8A2BE2, #FF1493, #4B0082);
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: white;
             overflow-x: hidden;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 100%;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 10px;
+            padding: 20px;
         }
 
         .header {
             text-align: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 30px;
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
             position: relative;
         }
 
         .language-switcher {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 8px;
+            top: 20px;
+            right: 20px;
         }
 
         .lang-btn {
-            padding: 6px 12px;
+            padding: 8px 16px;
             border: 2px solid white;
-            border-radius: 15px;
+            border-radius: 20px;
             background: transparent;
             color: white;
             cursor: pointer;
             font-weight: bold;
-            font-size: 12px;
             transition: all 0.3s ease;
+        }
+
+        .lang-btn:hover {
+            background: white;
+            color: #1a2a6c;
         }
 
         .lang-btn.active {
             background: white;
-            color: #8A2BE2;
+            color: #1a2a6c;
         }
 
         .title {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-            text-shadow: 0 0 15px #FF69B4, 0 0 25px #9370DB;
-            animation: sparkle 3s ease-in-out infinite;
-            padding: 0 60px 0 0;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #ff0080;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
         .subtitle {
-            font-size: 1em;
-            color: #E6E6FA;
+            font-size: 1.5em;
+            opacity: 0.9;
         }
 
-        .ar-container {
-            background: rgba(0, 0, 0, 0.3);
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            .title {
+                font-size: 2em;
+            }
+        }
+
+        .ar-section {
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 3px solid #9370DB;
-            box-shadow: 0 0 30px rgba(147, 112, 219, 0.5);
+            padding: 20px;
+            backdrop-filter: blur(10px);
         }
 
         #ar-scene {
             width: 100%;
-            height: 60vh;
-            min-height: 400px;
+            height: 500px;
             border-radius: 15px;
             overflow: hidden;
-            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .instructions h2 {
+            color: #ffeb3b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .step-number {
+            background: #ff0080;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .wishes {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .wish-item {
+            background: linear-gradient(45deg, rgba(255, 0, 128, 0.3), rgba(0, 255, 255, 0.3));
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 5px solid #ff0080;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .wish-item:nth-child(even) {
+            animation-delay: 1.5s;
+            border-left-color: #00ffff;
         }
 
         .loading {
             text-align: center;
-            padding: 40px 20px;
-            font-size: 1.2em;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            color: #E6E6FA;
-        }
-
-        .instructions {
-            text-align: center;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        .prophecy-display {
-            background: linear-gradient(135deg, #FF69B4, #9370DB);
-            padding: 20px;
-            border-radius: 20px;
-            margin: 15px 0;
-            text-align: center;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #FFFFFF;
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
-            font-size: 1.1em;
-            line-height: 1.4;
+            padding: 50px;
+            font-size: 1.5em;
         }
 
         .control-panel {
             display: flex;
             gap: 10px;
+            margin-top: 15px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 15px;
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: 10px 20px;
             border: none;
             border-radius: 25px;
-            background: linear-gradient(45deg, #FF69B4, #9370DB);
+            background: linear-gradient(45deg, #ff0080, #00ffff);
             color: white;
             cursor: pointer;
             font-weight: bold;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+            transition: transform 0.3s ease;
         }
 
-        .btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 10px rgba(255, 105, 180, 0.5);
+        .btn:hover {
+            transform: scale(1.1);
         }
 
-        .magic-sparkle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #FFFFFF;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: sparkle-float 4s ease-in-out infinite;
+        .movement-instructions {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
         }
 
-        @keyframes sparkle {
-            0%, 100% { 
-                text-shadow: 0 0 15px #FF69B4, 0 0 25px #9370DB;
+        .prophecy-display {
+            background: linear-gradient(45deg, #ff0080, #00ffff);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px #ff0080;
             }
-            50% { 
-                text-shadow: 0 0 25px #9370DB, 0 0 35px #FF69B4, 0 0 45px #FFFFFF;
+            to {
+                text-shadow: 0 0 30px #00ffff, 0 0 40px #ff0080;
             }
         }
 
-        @keyframes sparkle-float {
-            0%, 100% { 
-                transform: translateY(0) rotate(0deg);
-                opacity: 0.8;
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
             }
-            25% { 
-                transform: translateY(-20px) translateX(10px) rotate(90deg);
-                opacity: 1;
-            }
-            50% { 
-                transform: translateY(-40px) translateX(-5px) rotate(180deg);
-                opacity: 0.6;
-            }
-            75% { 
-                transform: translateY(-20px) translateX(-10px) rotate(270deg);
-                opacity: 0.9;
+            50% {
+                transform: translateY(-10px);
             }
         }
 
@@ -201,31 +239,28 @@
             display: none !important;
         }
 
-        /* Mobile optimizations */
-        @media (max-width: 480px) {
-            .title {
-                font-size: 1.5em;
-                padding: 0 50px 0 0;
-            }
-            
-            .btn {
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-            
-            #ar-scene {
-                height: 50vh;
-            }
-        }
-
-        .fairy-dust {
-            position: fixed;
+        .magic-effects {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1000;
+            z-index: 10;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: gold;
+            border-radius: 50%;
+            animation: sparkle-float 3s ease-in-out infinite;
+        }
+
+        @keyframes sparkle-float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
         }
     </style>
 </head>
@@ -240,57 +275,93 @@
             <!-- English Content -->
             <div id="en-content">
                 <h1 class="title">🎄 Magic Christmas Ball 🔮</h1>
-                <p class="subtitle">Point camera at marker & tap the magic ball!</p>
+                <p class="subtitle">Point camera at marker - magic appears automatically!</p>
             </div>
             
             <!-- Ukrainian Content -->
             <div id="uk-content" class="hidden">
                 <h1 class="title">🎄 Магічна Різдвяна Куля 🔮</h1>
-                <p class="subtitle">Наведи камеру на маркер та торкайся магічної кулі!</p>
+                <p class="subtitle">Наведи камеру на маркер - магія з'явиться автоматично!</p>
             </div>
         </header>
 
-        <div class="ar-container">
-            <div id="ar-scene">
-                <!-- English Loading -->
-                <div id="en-loading" class="loading">
-                    <p>✨ Looking for magic marker... ✨</p>
-                    <p>Point camera at the Christmas marker</p>
+        <div class="content">
+            <div class="ar-section">
+                <div id="ar-scene">
+                    <!-- AR scene will be created automatically -->
                 </div>
                 
-                <!-- Ukrainian Loading -->
-                <div id="uk-loading" class="loading hidden">
-                    <p>✨ Шукаємо магічний маркер... ✨</p>
-                    <p>Наведи камеру на різдвяний маркер</p>
+                <div class="prophecy-display" id="prophecy-display">
+                    <!-- English Default -->
+                    <div id="en-prophecy-default">Point camera at marker to see magic! ✨</div>
+                    <!-- Ukrainian Default -->
+                    <div id="uk-prophecy-default" class="hidden">Наведи камеру на маркер щоб побачити магію! ✨</div>
+                </div>
+                
+                <!-- English Movement Instructions -->
+                <div id="en-movement" class="movement-instructions">
+                    <p>🎮 <strong>Magic Instructions:</strong></p>
+                    <p>📱 <strong>1.</strong> Point camera at Christmas marker</p>
+                    <p>🔮 <strong>2.</strong> Magic ball appears automatically!</p>
+                    <p>👆 <strong>3.</strong> Tap the ball for Christmas prophecies!</p>
+                </div>
+                
+                <!-- Ukrainian Movement Instructions -->
+                <div id="uk-movement" class="movement-instructions hidden">
+                    <p>🎮 <strong>Магічні Інструкції:</strong></p>
+                    <p>📱 <strong>1.</strong> Наведи камеру на різдвяний маркер</p>
+                    <p>🔮 <strong>2.</strong> Магічна куля з'явиться автоматично!</p>
+                    <p>👆 <strong>3.</strong> Торкайся кулі для різдвяних пророцтв!</p>
+                </div>
+                
+                <div class="control-panel">
+                    <button class="btn" onclick="toggleSound()">🔊 Magic Sound</button>
+                    <button class="btn" onclick="createSparkles()">✨ More Magic!</button>
                 </div>
             </div>
-        </div>
 
-        <!-- English Instructions -->
-        <div id="en-instructions" class="instructions">
-            <p>🔮 <strong>Tap the magic ball</strong> to reveal your Christmas prophecy! ✨</p>
-        </div>
-        
-        <!-- Ukrainian Instructions -->
-        <div id="uk-instructions" class="instructions hidden">
-            <p>🔮 <strong>Торкнися магічної кулі</strong> щоб дізнатися своє різдвяне пророцтво! ✨</p>
-        </div>
-
-        <div class="prophecy-display" id="prophecy-display">
-            Your Christmas prophecy will appear here! ✨
-        </div>
-
-        <div class="control-panel">
-            <!-- English Buttons -->
-            <div id="en-buttons">
-                <button class="btn" onclick="newProphecy()">🔄 New Prophecy</button>
-                <button class="btn" onclick="toggleSound()">🔊 Magic Sound</button>
-            </div>
-            
-            <!-- Ukrainian Buttons -->
-            <div id="uk-buttons" class="hidden">
-                <button class="btn" onclick="newProphecy()">🔄 Нове Пророцтво</button>
-                <button class="btn" onclick="toggleSound()">🔊 Магічний Звук</button>
+            <div class="instructions">
+                <!-- English Instructions -->
+                <div id="en-instructions">
+                    <h2>📖 How the Magic Works:</h2>
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <p><strong>No buttons needed!</strong> Just point your camera</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <p>The magic ball appears automatically when marker is found</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <p>Tap the glowing ball - get Christmas prophecies! ✨</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <p>Move around - see the magic from different angles!</p>
+                    </div>
+                </div>
+                
+                <!-- Ukrainian Instructions -->
+                <div id="uk-instructions" class="hidden">
+                    <h2>📖 Як Працює Магія:</h2>
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <p><strong>Кнопки не потрібні!</strong> Просто наведи камеру</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <p>Магічна куля з'являється автоматично при знаходженні маркера</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <p>Торкайся сяючої кулі - отримуй різдвяні пророцтва! ✨</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <p>Рухайся навколо - дивись на магію з різних боків!</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -306,7 +377,7 @@
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            document.querySelector(`.lang-btn[onclick="switchLanguage('${lang}')"]`).classList.add('active');
+            event.target.classList.add('active');
             
             // Show/hide content based on language
             document.querySelectorAll('[id$="-content"]').forEach(el => {
@@ -314,57 +385,48 @@
             });
             document.getElementById(`${lang}-content`).classList.remove('hidden');
             
-            document.querySelectorAll('[id$="-loading"]').forEach(el => {
+            document.querySelectorAll('[id$="-movement"]').forEach(el => {
                 el.classList.add('hidden');
             });
-            document.getElementById(`${lang}-loading`).classList.remove('hidden');
+            document.getElementById(`${lang}-movement`).classList.remove('hidden');
             
             document.querySelectorAll('[id$="-instructions"]').forEach(el => {
                 el.classList.add('hidden');
             });
             document.getElementById(`${lang}-instructions`).classList.remove('hidden');
             
-            document.querySelectorAll('[id$="-buttons"]').forEach(el => {
+            document.querySelectorAll('[id$="-prophecy-default"]').forEach(el => {
                 el.classList.add('hidden');
             });
-            document.getElementById(`${lang}-buttons`).classList.remove('hidden');
-            
-            // Update prophecy display
-            updateProphecyDisplay();
+            document.getElementById(`${lang}-prophecy-default`).classList.remove('hidden');
         }
 
-        // Prophecies in both languages
+        // Christmas prophecies for children
         const prophecies = {
             en: [
-                "This Christmas, you'll receive the most magical gift that will make you smile every day! 🎁✨",
-                "Santa has a special surprise just for you - something sparkly and wonderful! 🌟🎅",
-                "Your Christmas wish will come true in the most unexpected way! Make a wish! 💫",
-                "This holiday season, you'll make a new friend who loves Christmas as much as you do! 🦌❤️",
-                "Magic snowflakes will bring you joy and laughter all Christmas long! ❄️😊",
-                "You'll be the star of Christmas celebrations with your happy energy! ⭐🎄",
-                "The Christmas elves are working on something extra special just for you! 🧝‍♂️✨",
-                "Your kindness this Christmas will create magic that lasts all year! 🌈💖",
-                "Look for the shooting star on Christmas Eve - it carries your special wish! 🌠",
-                "The reindeer have chosen you for a magical Christmas adventure! 🦄🎄"
+                "This Christmas, you'll receive the most magical gift! 🎁✨",
+                "Santa has a special surprise just for you! 🌟🎅", 
+                "Your Christmas wish will come true! Make a wish! 💫",
+                "Magic snowflakes will bring you joy! ❄️😊",
+                "You'll be the star of Christmas celebrations! ⭐🎄",
+                "Christmas elves are working on something special for you! 🧝‍♂️✨",
+                "Your kindness will create magic that lasts all year! 🌈💖",
+                "Look for the shooting star on Christmas Eve! 🌠",
+                "The reindeer chose you for a magical adventure! 🦄🎄",
+                "This Christmas will be the most magical ever! 🔮🎉"
             ],
             uk: [
-                "Цього Різдва ти отримаєш найчарівніший подарунок, який змусить тебе посміхатися щодня! 🎁✨",
-                "Дід Мороз приготував для тебе особливий сюрприз - щось блискуче та дивовижне! 🌟🎅",
-                "Твоє різдвяне бажання здійсниться найнесподіванішим чином! Загадай бажання! 💫",
-                "Цього святкового сезону ти знайдеш нового друга, який так само любить Різдво! 🦌❤️",
-                "Чарівні сніжинки принесуть тобі радість та сміх на всі різдвяні свята! ❄️😊",
-                "Ти будеш зіркою різдвяних святкувань завдяки своїй щасливій енергії! ⭐🎄",
-                "Різдвяні ельфи працюють над чимось дуже особливим саме для тебе! 🧝‍♂️✨",
-                "Твоя доброта цього Різдва створить магію, яка триватиме цілий рік! 🌈💖",
-                "Шукай падаючу зірку в Різдвяну ніч - вона несе твоє особливе бажання! 🌠",
-                "Північні олені обрали тебе для магічної різдвяної пригоди! 🦄🎄"
+                "Цього Різдва ти отримаєш найчарівніший подарунок! 🎁✨",
+                "Дід Мороз приготував для тебе особливий сюрприз! 🌟🎅",
+                "Твоє різдвяне бажання здійсниться! Загадай бажання! 💫",
+                "Чарівні сніжинки принесуть тобі радість! ❄️😊",
+                "Ти будеш зіркою різдвяних святкувань! ⭐🎄",
+                "Різдвяні ельфи працюють над чимось особливим для тебе! 🧝‍♂️✨",
+                "Твоя доброта створить магію на цілий рік! 🌈💖",
+                "Шукай падаючу зірку в Різдвяну ніч! 🌠",
+                "Північні олені обрали тебе для магічної пригоди! 🦄🎄",
+                "Це Різдво буде найчарівнішим! 🔮🎉"
             ]
-        };
-
-        // Default texts
-        const defaultTexts = {
-            en: "Your Christmas prophecy will appear here! ✨",
-            uk: "Твоє різдвяне пророцтво з'явиться тут! ✨"
         };
 
         // Audio manager
@@ -381,114 +443,96 @@
             }
         }
 
-        function newProphecy() {
-            const randomProphecy = prophecies[currentLanguage][Math.floor(Math.random() * prophecies[currentLanguage].length)];
-            document.getElementById('prophecy-display').textContent = randomProphecy;
-            createFairyDust();
-        }
-
-        function updateProphecyDisplay() {
-            const display = document.getElementById('prophecy-display');
-            if (display.textContent === defaultTexts['en'] || display.textContent === defaultTexts['uk']) {
-                display.textContent = defaultTexts[currentLanguage];
-            }
-        }
-
-        // Create fairy dust effect
-        function createFairyDust() {
-            const dust = document.createElement('div');
-            dust.className = 'fairy-dust';
+        function createSparkles() {
+            const container = document.getElementById('ar-scene');
+            const effects = document.createElement('div');
+            effects.className = 'magic-effects';
             
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 15; i++) {
                 const sparkle = document.createElement('div');
-                sparkle.className = 'magic-sparkle';
-                sparkle.style.left = Math.random() * 100 + 'vw';
-                sparkle.style.top = Math.random() * 100 + 'vh';
-                sparkle.style.background = ['#FF69B4', '#9370DB', '#FFFFFF', '#FFD700'][i % 4];
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
                 sparkle.style.animationDelay = Math.random() * 2 + 's';
-                sparkle.style.animationDuration = (3 + Math.random() * 2) + 's';
-                dust.appendChild(sparkle);
+                effects.appendChild(sparkle);
             }
             
-            document.body.appendChild(dust);
-            setTimeout(() => dust.remove(), 4000);
+            container.appendChild(effects);
+            setTimeout(() => effects.remove(), 3000);
         }
 
-        // Initialize AR scene automatically
+        // Initialize AR scene automatically on page load
         function initializeAR() {
             const scene = document.createElement('a-scene');
             
-            // MindAR configuration for marker
+            // MindAR configuration - auto starts when marker found
             scene.setAttribute('mindar-image', {
                 imageTargetSrc: 'assets/marker.mind',
                 maxTrack: 1,
-                filterMinCF: 0.0001,
-                filterBeta: 1000,
+                autoStart: true
             });
-            scene.setAttribute('color-space', 'sRGB');
             scene.setAttribute('embedded', '');
-            scene.setAttribute('renderer', 'colorManagement: true; physicallyCorrectLights: true;');
-            scene.setAttribute('loading-screen', 'enabled: false;');
+            scene.setAttribute('renderer', 'colorManagement: true');
+            scene.setAttribute('loading-screen', 'enabled: false');
 
             // Camera
             const camera = document.createElement('a-camera');
             camera.setAttribute('position', '0 0 0');
             camera.setAttribute('look-controls', 'enabled: true');
-            camera.setAttribute('cursor', 'rayOrigin: mouse;');
             scene.appendChild(camera);
 
             // Target for tracking
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
-            // MAGICAL CRYSTAL BALL - semi-transparent pink to purple
-            const crystalBall = document.createElement('a-sphere');
-            crystalBall.setAttribute('radius', '0.3');
-            crystalBall.setAttribute('color', '#FF69B4');
-            crystalBall.setAttribute('transparent', 'true');
-            crystalBall.setAttribute('opacity', '0.8');
-            crystalBall.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 8000');
+            // MAGIC BALL - appears automatically when marker is found
+            const sphere = document.createElement('a-sphere');
+            sphere.setAttribute('radius', '0.4');
+            sphere.setAttribute('color', '#FF69B4');
+            sphere.setAttribute('transparent', 'true');
+            sphere.setAttribute('opacity', '0.8');
+            sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 8000');
 
-            // Inner core - purple
+            // Inner magic core
             const innerCore = document.createElement('a-sphere');
-            innerCore.setAttribute('radius', '0.2');
+            innerCore.setAttribute('radius', '0.25');
             innerCore.setAttribute('color', '#9370DB');
             innerCore.setAttribute('transparent', 'true');
             innerCore.setAttribute('opacity', '0.6');
             innerCore.setAttribute('animation', 'property: rotation; to: 360 0 360; loop: true; dur: 6000');
 
-            // Sparkling outer layer
-            const sparkleLayer = document.createElement('a-sphere');
-            sparkleLayer.setAttribute('radius', '0.32');
-            sparkleLayer.setAttribute('color', '#FFFFFF');
-            sparkleLayer.setAttribute('transparent', 'true');
-            sparkleLayer.setAttribute('opacity', '0.4');
-            sparkleLayer.setAttribute('wireframe', 'true');
-            sparkleLayer.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 12000');
+            // Sparkling effect
+            const sparkleEffect = document.createElement('a-sphere');
+            sparkleEffect.setAttribute('radius', '0.45');
+            sparkleEffect.setAttribute('color', '#FFFFFF');
+            sparkleEffect.setAttribute('transparent', 'true');
+            sparkleEffect.setAttribute('opacity', '0.3');
+            sparkleEffect.setAttribute('wireframe', 'true');
+            sparkleEffect.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 12000');
 
-            // Floating particles around the ball
-            for (let i = 0; i < 6; i++) {
-                const angle = (i / 6) * Math.PI * 2;
+            // Floating particles
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
                 const particle = document.createElement('a-sphere');
                 particle.setAttribute('radius', '0.02');
                 particle.setAttribute('color', i % 2 === 0 ? '#FF69B4' : '#9370DB');
-                particle.setAttribute('position', `${Math.cos(angle) * 0.5} ${Math.sin(angle) * 0.5} 0`);
+                particle.setAttribute('position', `${Math.cos(angle) * 0.6} ${Math.sin(angle) * 0.6} 0`);
                 particle.setAttribute('animation', `
                     property: position;
-                    to: ${Math.cos(angle) * 0.6} ${Math.sin(angle) * 0.6} 0;
+                    to: ${Math.cos(angle) * 0.7} ${Math.sin(angle) * 0.7} 0;
                     dir: alternate;
                     loop: true;
-                    dur: ${2000 + i * 500};
+                    dur: ${2000 + i * 300};
                 `);
                 target.appendChild(particle);
             }
 
-            // Click handler for magic ball
+            // Click handler for magic prophecies
             function handleMagicClick() {
-                // Scale animation
-                crystalBall.setAttribute('animation', `
+                // Ball animation
+                sphere.setAttribute('animation', `
                     property: scale;
-                    to: 1.4 1.4 1.4;
+                    to: 1.3 1.3 1.3;
                     dur: 300;
                     dir: alternate;
                 `);
@@ -496,53 +540,48 @@
                 // Magical color change
                 const colors = ['#FF69B4', '#9370DB', '#BA55D3', '#FF1493', '#8A2BE2'];
                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                crystalBall.setAttribute('color', randomColor);
+                sphere.setAttribute('color', randomColor);
 
                 // Sound effect
                 if (isSoundOn) {
                     const magicSound = new Audio('fon.mp3');
-                    magicSound.volume = 0.3;
+                    magicSound.volume = 0.2;
                     magicSound.play().catch(() => {});
                 }
 
                 // Show random prophecy
-                newProphecy();
+                const randomProphecy = prophecies[currentLanguage][Math.floor(Math.random() * prophecies[currentLanguage].length)];
+                document.getElementById('prophecy-display').textContent = randomProphecy;
 
-                // Create fairy effect
-                createFairyDust();
+                // Create sparkle effect
+                createSparkles();
             }
 
-            // Add event handlers to all ball parts
-            crystalBall.addEventListener('click', handleMagicClick);
+            // Add click events to all ball elements
+            sphere.addEventListener('click', handleMagicClick);
             innerCore.addEventListener('click', handleMagicClick);
-            sparkleLayer.addEventListener('click', handleMagicClick);
+            sparkleEffect.addEventListener('click', handleMagicClick);
 
             // Add all elements to target
-            target.appendChild(crystalBall);
+            target.appendChild(sphere);
             target.appendChild(innerCore);
-            target.appendChild(sparkleLayer);
+            target.appendChild(sparkleEffect);
 
             scene.appendChild(target);
 
-            // Replace scene
+            // Add scene to container
             const arContainer = document.getElementById('ar-scene');
-            arContainer.innerHTML = '';
             arContainer.appendChild(scene);
 
-            console.log('AR scene initialized for marker tracking!');
+            console.log('Magic AR initialized - ball appears automatically when marker found!');
         }
 
-        // Initialize on load
+        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            createFairyDust();
-            // Automatically initialize AR scene
-            setTimeout(initializeAR, 1000);
-        });
-
-        // Error handling
-        window.addEventListener('error', function(e) {
-            console.error('Error:', e.error);
+            createSparkles();
+            initializeAR();
         });
     </script>
 </body>
 </html>
+
