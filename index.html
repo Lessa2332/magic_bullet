@@ -219,7 +219,7 @@
                     </div>
                 </div>
                 <div class="current-wish" id="current-wish">
-                    Натисни на магічну кулю, щоб активувати магію!
+                    Торкнись магічної кулі, щоб побачити пророцтво!
                 </div>
                 <div class="control-panel">
                     <button class="btn" onclick="startAR()">▶️ Старт AR</button>
@@ -244,7 +244,7 @@
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <p>Торкнись кулі — і побачиш знак магії!</p>
+                    <p>Торкнись кулі — і побачиш різдвяне пророцтво!</p>
                 </div>
             </div>
         </div>
@@ -279,41 +279,72 @@
             }
         }
 
-        let magicSign = null;
+        let prophecyText = null;
+        let prophecyShadow = null;
 
-        function createMagicSign(parent) {
-            // Видаляємо попередній знак
-            if (magicSign && magicSign.parentNode) {
-                magicSign.parentNode.removeChild(magicSign);
+        function showProphecy(parent) {
+            // Видаляємо попередній текст
+            if (prophecyText && prophecyText.parentNode) {
+                parent.removeChild(prophecyText);
+                prophecyText = null;
+            }
+            if (prophecyShadow && prophecyShadow.parentNode) {
+                parent.removeChild(prophecyShadow);
+                prophecyShadow = null;
             }
 
-            magicSign = document.createElement('a-text');
-            magicSign.setAttribute('value', '!');
-            magicSign.setAttribute('position', '0 1.3 0'); // над кулею (північний полюс)
-            magicSign.setAttribute('color', '#ffffff');
-            magicSign.setAttribute('align', 'center');
-            magicSign.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
-            magicSign.setAttribute('side', 'double');
-            magicSign.setAttribute('opacity', '0');
-            magicSign.setAttribute('animation__fade', 'property: opacity; from: 0; to: 1; dur: 600; easing: easeOutCubic');
-            magicSign.setAttribute('animation__scale', 'property: scale; from: 0.5 0.5 0.5; to: 1.5 1.5 1.5; dur: 600; easing: easeOutBack');
-            magicSign.setAttribute('animation__pulse', 'property: scale; from: 1.5 1.5 1.5; to: 1.2 1.2 1.2; dur: 1000; loop: true; dir: alternate; easing: easeInOutSine');
+            const message = "Щасливого Різдва!";
 
-            parent.appendChild(magicSign);
+            // Тінь для кращої читабельності
+            prophecyShadow = document.createElement('a-text');
+            prophecyShadow.setAttribute('value', message);
+            prophecyShadow.setAttribute('position', '0.02 -0.12 0.82'); // трохи всередині кулі
+            prophecyShadow.setAttribute('color', '#000000');
+            prophecyShadow.setAttribute('opacity', '0.6');
+            prophecyShadow.setAttribute('width', '3');
+            prophecyShadow.setAttribute('align', 'center');
+            prophecyShadow.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
+            prophecyShadow.setAttribute('side', 'double');
 
-            // Зникне через 3 секунди
+            // Основний текст
+            prophecyText = document.createElement('a-text');
+            prophecyText.setAttribute('value', message);
+            prophecyText.setAttribute('position', '0 -0.1 0.8'); // всередині кулі
+            prophecyText.setAttribute('color', '#FFD700'); // золотий
+            prophecyText.setAttribute('width', '3');
+            prophecyText.setAttribute('align', 'center');
+            prophecyText.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
+            prophecyText.setAttribute('side', 'double');
+            prophecyText.setAttribute('opacity', '0');
+            prophecyText.setAttribute('animation__fade', 'property: opacity; from: 0; to: 1; dur: 1000; easing: easeOutCubic');
+            prophecyText.setAttribute('animation__scale', 'property: scale; from: 0.8 0.8 0.8; to: 1 1 1; dur: 1000; easing: easeOutBack');
+
+            parent.appendChild(prophecyShadow);
+            parent.appendChild(prophecyText);
+
+            // Запускаємо анімацію
             setTimeout(() => {
-                if (magicSign && magicSign.parentNode) {
-                    magicSign.setAttribute('animation__disappear', 'property: opacity; to: 0; dur: 800; startEvents: disappear');
-                    magicSign.emit('disappear');
-                    setTimeout(() => {
-                        if (magicSign && magicSign.parentNode) {
-                            magicSign.parentNode.removeChild(magicSign);
-                            magicSign = null;
-                        }
-                    }, 800);
+                if (prophecyText) prophecyText.emit('fadein');
+                if (prophecyShadow) prophecyShadow.emit('fadein');
+            }, 100);
+
+            // Автоматично приховуємо через 4 секунди
+            setTimeout(() => {
+                if (prophecyText && prophecyText.parentNode) {
+                    prophecyText.setAttribute('animation__out', 'property: opacity; to: 0; dur: 800; startEvents: fadeout');
+                    prophecyText.emit('fadeout');
                 }
-            }, 3000);
+                if (prophecyShadow && prophecyShadow.parentNode) {
+                    prophecyShadow.setAttribute('animation__out', 'property: opacity; to: 0; dur: 800; startEvents: fadeout');
+                    prophecyShadow.emit('fadeout');
+                }
+                setTimeout(() => {
+                    if (prophecyText && prophecyText.parentNode) parent.removeChild(prophecyText);
+                    if (prophecyShadow && prophecyShadow.parentNode) parent.removeChild(prophecyShadow);
+                    prophecyText = null;
+                    prophecyShadow = null;
+                }, 800);
+            }, 4000);
         }
 
         function startAR() {
@@ -337,20 +368,20 @@
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
-            // Скляна оболонка кулі (зовнішня)
+            // Скляна оболонка
             const glassShell = document.createElement('a-sphere');
             glassShell.setAttribute('radius', '1');
             glassShell.setAttribute('position', '0 0 0');
             glassShell.setAttribute('material', 'transparent: true; opacity: 0.25; color: #e0f7fa; shader: flat');
-            glassShell.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear');
+            glassShell.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000');
 
-            // Внутрішнє світіння (емісія)
+            // Внутрішнє світіння
             const innerGlow = document.createElement('a-sphere');
             innerGlow.setAttribute('radius', '0.95');
             innerGlow.setAttribute('position', '0 0 0');
-            innerGlow.setAttribute('material', 'transparent: true; opacity: 0.4; color: #00b0ff; shader: flat; emissive: #00b0ff; emissiveIntensity: 0.8');
+            innerGlow.setAttribute('material', 'transparent: true; opacity: 0.4; color: #00b0ff; shader: flat');
 
-            // Внутрішній куб (залишаємо для магії, але робимо дискретним)
+            // Декоративний внутрішній куб
             const innerCube = document.createElement('a-box');
             innerCube.setAttribute('width', '1.1');
             innerCube.setAttribute('height', '1.1');
@@ -362,7 +393,7 @@
             innerCube.setAttribute('wireframe', 'true');
             innerCube.setAttribute('animation', 'property: rotation; to: 360 360 360; loop: true; dur: 15000');
 
-            // Кільця (залишаємо, але робимо тоншими)
+            // Кільця
             const ring1 = document.createElement('a-cylinder');
             ring1.setAttribute('radius', '1.6');
             ring1.setAttribute('height', '0.05');
@@ -381,7 +412,6 @@
             ring2.setAttribute('opacity', '0.3');
             ring2.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 9000');
 
-            // ЗБЕРІГАЄМО ТІЛЬКИ ЦІ ЕЛЕМЕНТИ:
             target.appendChild(glassShell);
             target.appendChild(innerGlow);
             target.appendChild(innerCube);
@@ -394,12 +424,12 @@
             hint.setAttribute('value', 'Торкнись кулі!');
             hint.setAttribute('position', '0 -0.3 1');
             hint.setAttribute('color', '#FFD700');
-            hint.setAttribute('align', 'center');
             hint.setAttribute('width', '3');
+            hint.setAttribute('align', 'center');
             hint.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
             target.appendChild(hint);
 
-            // Обробник кліку — тепер на будь-який дочірній елемент
+            // Клік — показує пророцтво
             function addClickHandler(element) {
                 element.addEventListener('click', function () {
                     if (isSoundOn) {
@@ -407,15 +437,11 @@
                         clickSound.volume = 0.3;
                         clickSound.play().catch(e => console.log("Click sound failed:", e));
                     }
-                    createMagicSign(target); // Знак "!" з'являється
+                    showProphecy(target);
                 });
             }
 
-            // Додаємо обробник до ВСІХ кликабельних частин
-            [glassShell, innerGlow, innerCube, ring1, ring2, hint].forEach(el => {
-                el.setAttribute('cursor-listener', ''); // A-Frame потребує цього для mouse-ray
-                addClickHandler(el);
-            });
+            [glassShell, innerGlow, innerCube, ring1, ring2, hint].forEach(addClickHandler);
 
             const arContainer = document.getElementById('ar-scene');
             arContainer.innerHTML = '';
@@ -438,7 +464,7 @@
             `;
             const wishDisplay = document.getElementById('current-wish');
             wishDisplay.style.display = 'flex';
-            wishDisplay.textContent = 'Торкнись магічної кулі, щоб побачити знак магії!';
+            wishDisplay.textContent = 'Торкнись магічної кулі, щоб побачити пророцтво!';
             audio.pause();
         }
 
