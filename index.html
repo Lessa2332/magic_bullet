@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Christmas Magic Ball</title>
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image-aframe.prod.js"></script>
+    <title>Magic Christmas Ball</title>
+    <!-- Стабільні версії що працювали -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.0.0/dist/mindar-image-aframe.prod.js"></script>
     <style>
         * {
             margin: 0;
@@ -14,253 +15,160 @@
         }
 
         body {
-            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(135deg, #8A2BE2, #FF1493, #4B0082);
             color: white;
             overflow-x: hidden;
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
 
         .header {
             text-align: center;
-            padding: 30px 0;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             backdrop-filter: blur(10px);
             position: relative;
         }
 
         .language-switcher {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
         }
 
         .lang-btn {
-            padding: 8px 16px;
+            padding: 6px 12px;
             border: 2px solid white;
-            border-radius: 20px;
+            border-radius: 15px;
             background: transparent;
             color: white;
             cursor: pointer;
             font-weight: bold;
+            font-size: 12px;
             transition: all 0.3s ease;
-        }
-
-        .lang-btn:hover {
-            background: white;
-            color: #1a2a6c;
         }
 
         .lang-btn.active {
             background: white;
-            color: #1a2a6c;
+            color: #8A2BE2;
         }
 
         .title {
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px #ff0080;
-            animation: glow 2s ease-in-out infinite alternate;
+            font-size: 2em;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px #FF69B4, 0 0 25px #9370DB;
+            padding: 0 60px 0 0;
         }
 
         .subtitle {
-            font-size: 1.5em;
-            opacity: 0.9;
+            font-size: 1em;
+            color: #E6E6FA;
         }
 
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: start;
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
-            .title {
-                font-size: 2em;
-            }
-        }
-
-        .ar-section {
-            background: rgba(255, 255, 255, 0.1);
+        .ar-container {
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 20px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 3px solid #9370DB;
         }
 
         #ar-scene {
             width: 100%;
-            height: 500px;
+            height: 60vh;
+            min-height: 400px;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .instructions {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .instructions h2 {
-            color: #ffeb3b;
-            margin-bottom: 20px;
             text-align: center;
-        }
-
-        .step {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
             padding: 15px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
         }
 
-        .step-number {
-            background: #ff0080;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .prophecy-display {
+            background: linear-gradient(135deg, #FF69B4, #9370DB);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 15px 0;
+            text-align: center;
+            min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .wishes {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .wish-item {
-            background: linear-gradient(45deg, rgba(255, 0, 128, 0.3), rgba(0, 255, 255, 0.3));
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            border-left: 5px solid #ff0080;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .wish-item:nth-child(even) {
-            animation-delay: 1.5s;
-            border-left-color: #00ffff;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.5em;
+            border: 2px solid #FFFFFF;
+            font-size: 1.1em;
+            line-height: 1.4;
         }
 
         .control-panel {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 15px;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
             border-radius: 25px;
-            background: linear-gradient(45deg, #ff0080, #00ffff);
+            background: linear-gradient(45deg, #FF69B4, #9370DB);
             color: white;
             cursor: pointer;
             font-weight: bold;
-            transition: transform 0.3s ease;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
 
-        .btn:hover {
-            transform: scale(1.1);
-        }
-
-        .movement-instructions {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        .prophecy-display {
-            background: linear-gradient(45deg, #ff0080, #00ffff);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 15px 0;
-            text-align: center;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 20px #ff0080;
-            }
-            to {
-                text-shadow: 0 0 30px #00ffff, 0 0 40px #ff0080;
-            }
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+        .btn:active {
+            transform: scale(0.95);
         }
 
         .hidden {
             display: none !important;
         }
 
-        .magic-effects {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .sparkle {
+        .magic-sparkle {
             position: absolute;
             width: 6px;
             height: 6px;
             background: gold;
             border-radius: 50%;
+            pointer-events: none;
             animation: sparkle-float 3s ease-in-out infinite;
         }
 
         @keyframes sparkle-float {
             0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
             50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.5em;
+                padding: 0 50px 0 0;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -272,97 +180,39 @@
                 <button class="lang-btn" onclick="switchLanguage('uk')">UK</button>
             </div>
             
-            <!-- English Content -->
             <div id="en-content">
                 <h1 class="title">🎄 Magic Christmas Ball 🔮</h1>
-                <p class="subtitle">Point camera at marker - magic appears automatically!</p>
+                <p class="subtitle">Point camera at marker - magic appears!</p>
             </div>
             
-            <!-- Ukrainian Content -->
             <div id="uk-content" class="hidden">
                 <h1 class="title">🎄 Магічна Різдвяна Куля 🔮</h1>
-                <p class="subtitle">Наведи камеру на маркер - магія з'явиться автоматично!</p>
+                <p class="subtitle">Наведи камеру на маркер - з'явиться магія!</p>
             </div>
         </header>
 
-        <div class="content">
-            <div class="ar-section">
-                <div id="ar-scene">
-                    <!-- AR scene will be created automatically -->
-                </div>
-                
-                <div class="prophecy-display" id="prophecy-display">
-                    <!-- English Default -->
-                    <div id="en-prophecy-default">Point camera at marker to see magic! ✨</div>
-                    <!-- Ukrainian Default -->
-                    <div id="uk-prophecy-default" class="hidden">Наведи камеру на маркер щоб побачити магію! ✨</div>
-                </div>
-                
-                <!-- English Movement Instructions -->
-                <div id="en-movement" class="movement-instructions">
-                    <p>🎮 <strong>Magic Instructions:</strong></p>
-                    <p>📱 <strong>1.</strong> Point camera at Christmas marker</p>
-                    <p>🔮 <strong>2.</strong> Magic ball appears automatically!</p>
-                    <p>👆 <strong>3.</strong> Tap the ball for Christmas prophecies!</p>
-                </div>
-                
-                <!-- Ukrainian Movement Instructions -->
-                <div id="uk-movement" class="movement-instructions hidden">
-                    <p>🎮 <strong>Магічні Інструкції:</strong></p>
-                    <p>📱 <strong>1.</strong> Наведи камеру на різдвяний маркер</p>
-                    <p>🔮 <strong>2.</strong> Магічна куля з'явиться автоматично!</p>
-                    <p>👆 <strong>3.</strong> Торкайся кулі для різдвяних пророцтв!</p>
-                </div>
-                
-                <div class="control-panel">
-                    <button class="btn" onclick="toggleSound()">🔊 Magic Sound</button>
-                    <button class="btn" onclick="createSparkles()">✨ More Magic!</button>
-                </div>
+        <div class="ar-container">
+            <div id="ar-scene">
+                <!-- AR scene will appear here -->
             </div>
+        </div>
 
-            <div class="instructions">
-                <!-- English Instructions -->
-                <div id="en-instructions">
-                    <h2>📖 How the Magic Works:</h2>
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <p><strong>No buttons needed!</strong> Just point your camera</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <p>The magic ball appears automatically when marker is found</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <p>Tap the glowing ball - get Christmas prophecies! ✨</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">4</div>
-                        <p>Move around - see the magic from different angles!</p>
-                    </div>
-                </div>
-                
-                <!-- Ukrainian Instructions -->
-                <div id="uk-instructions" class="hidden">
-                    <h2>📖 Як Працює Магія:</h2>
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <p><strong>Кнопки не потрібні!</strong> Просто наведи камеру</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <p>Магічна куля з'являється автоматично при знаходженні маркера</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <p>Торкайся сяючої кулі - отримуй різдвяні пророцтва! ✨</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">4</div>
-                        <p>Рухайся навколо - дивись на магію з різних боків!</p>
-                    </div>
-                </div>
+        <div class="instructions">
+            <div id="en-instructions">
+                <p>🔮 <strong>Point camera at Christmas marker</strong> - the magic ball appears automatically!</p>
             </div>
+            <div id="uk-instructions" class="hidden">
+                <p>🔮 <strong>Наведи камеру на різдвяний маркер</strong> - магічна куля з'явиться автоматично!</p>
+            </div>
+        </div>
+
+        <div class="prophecy-display" id="prophecy-display">
+            <div id="en-prophecy">Point camera at marker to begin magic! ✨</div>
+            <div id="uk-prophecy" class="hidden">Наведи камеру на маркер щоб почати магію! ✨</div>
+        </div>
+
+        <div class="control-panel">
+            <button class="btn" onclick="createSparkles()">✨ More Magic!</button>
         </div>
     </div>
 
@@ -373,99 +223,55 @@
         function switchLanguage(lang) {
             currentLanguage = lang;
             
-            // Update language buttons
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            // Update buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Show/hide content based on language
-            document.querySelectorAll('[id$="-content"]').forEach(el => {
-                el.classList.add('hidden');
-            });
-            document.getElementById(`${lang}-content`).classList.remove('hidden');
-            
-            document.querySelectorAll('[id$="-movement"]').forEach(el => {
-                el.classList.add('hidden');
-            });
-            document.getElementById(`${lang}-movement`).classList.remove('hidden');
-            
-            document.querySelectorAll('[id$="-instructions"]').forEach(el => {
-                el.classList.add('hidden');
-            });
-            document.getElementById(`${lang}-instructions`).classList.remove('hidden');
-            
-            document.querySelectorAll('[id$="-prophecy-default"]').forEach(el => {
-                el.classList.add('hidden');
-            });
-            document.getElementById(`${lang}-prophecy-default`).classList.remove('hidden');
+            // Toggle content
+            document.getElementById('en-content').classList.toggle('hidden', lang !== 'en');
+            document.getElementById('uk-content').classList.toggle('hidden', lang !== 'uk');
+            document.getElementById('en-instructions').classList.toggle('hidden', lang !== 'en');
+            document.getElementById('uk-instructions').classList.toggle('hidden', lang !== 'uk');
+            document.getElementById('en-prophecy').classList.toggle('hidden', lang !== 'en');
+            document.getElementById('uk-prophecy').classList.toggle('hidden', lang !== 'uk');
         }
 
-        // Christmas prophecies for children
+        // Christmas prophecies
         const prophecies = {
             en: [
                 "This Christmas, you'll receive the most magical gift! 🎁✨",
                 "Santa has a special surprise just for you! 🌟🎅", 
-                "Your Christmas wish will come true! Make a wish! 💫",
+                "Your Christmas wish will come true! 💫",
                 "Magic snowflakes will bring you joy! ❄️😊",
-                "You'll be the star of Christmas celebrations! ⭐🎄",
-                "Christmas elves are working on something special for you! 🧝‍♂️✨",
-                "Your kindness will create magic that lasts all year! 🌈💖",
-                "Look for the shooting star on Christmas Eve! 🌠",
-                "The reindeer chose you for a magical adventure! 🦄🎄",
-                "This Christmas will be the most magical ever! 🔮🎉"
+                "You'll be the star of Christmas! ⭐🎄"
             ],
             uk: [
                 "Цього Різдва ти отримаєш найчарівніший подарунок! 🎁✨",
-                "Дід Мороз приготував для тебе особливий сюрприз! 🌟🎅",
-                "Твоє різдвяне бажання здійсниться! Загадай бажання! 💫",
-                "Чарівні сніжинки принесуть тобі радість! ❄️😊",
-                "Ти будеш зіркою різдвяних святкувань! ⭐🎄",
-                "Різдвяні ельфи працюють над чимось особливим для тебе! 🧝‍♂️✨",
-                "Твоя доброта створить магію на цілий рік! 🌈💖",
-                "Шукай падаючу зірку в Різдвяну ніч! 🌠",
-                "Північні олені обрали тебе для магічної пригоди! 🦄🎄",
-                "Це Різдво буде найчарівнішим! 🔮🎉"
+                "Дід Мороз приготував для тебе сюрприз! 🌟🎅",
+                "Твоє різдвяне бажання здійсниться! 💫",
+                "Чарівні сніжинки принесуть радість! ❄️😊",
+                "Ти будеш зіркою Різдва! ⭐🎄"
             ]
         };
 
-        // Audio manager
-        const audio = new Audio('fon.mp3');
-        audio.loop = true;
-        let isSoundOn = false;
-
-        function toggleSound() {
-            isSoundOn = !isSoundOn;
-            if (isSoundOn) {
-                audio.play().catch(e => console.log("Audio error"));
-            } else {
-                audio.pause();
-            }
-        }
-
         function createSparkles() {
-            const container = document.getElementById('ar-scene');
-            const effects = document.createElement('div');
-            effects.className = 'magic-effects';
-            
-            for (let i = 0; i < 15; i++) {
+            const container = document.querySelector('.container');
+            for (let i = 0; i < 10; i++) {
                 const sparkle = document.createElement('div');
-                sparkle.className = 'sparkle';
-                sparkle.style.left = Math.random() * 100 + '%';
-                sparkle.style.top = Math.random() * 100 + '%';
+                sparkle.className = 'magic-sparkle';
+                sparkle.style.left = Math.random() * 100 + 'vw';
+                sparkle.style.top = Math.random() * 100 + 'vh';
                 sparkle.style.animationDelay = Math.random() * 2 + 's';
-                effects.appendChild(sparkle);
+                container.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 3000);
             }
-            
-            container.appendChild(effects);
-            setTimeout(() => effects.remove(), 3000);
         }
 
-        // Initialize AR scene automatically on page load
+        // Initialize AR - проста стабільна версія
         function initializeAR() {
             const scene = document.createElement('a-scene');
             
-            // MindAR configuration - auto starts when marker found
+            // Базова конфігурація MindAR
             scene.setAttribute('mindar-image', {
                 imageTargetSrc: 'assets/marker.mind',
                 maxTrack: 1,
@@ -473,115 +279,72 @@
             });
             scene.setAttribute('embedded', '');
             scene.setAttribute('renderer', 'colorManagement: true');
-            scene.setAttribute('loading-screen', 'enabled: false');
 
-            // Camera
+            // Камера
             const camera = document.createElement('a-camera');
             camera.setAttribute('position', '0 0 0');
             camera.setAttribute('look-controls', 'enabled: true');
             scene.appendChild(camera);
 
-            // Target for tracking
+            // Ціль
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
-            // MAGIC BALL - appears automatically when marker is found
+            // Магічна куля
             const sphere = document.createElement('a-sphere');
-            sphere.setAttribute('radius', '0.4');
+            sphere.setAttribute('radius', '0.3');
             sphere.setAttribute('color', '#FF69B4');
             sphere.setAttribute('transparent', 'true');
             sphere.setAttribute('opacity', '0.8');
             sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 8000');
 
-            // Inner magic core
-            const innerCore = document.createElement('a-sphere');
-            innerCore.setAttribute('radius', '0.25');
-            innerCore.setAttribute('color', '#9370DB');
-            innerCore.setAttribute('transparent', 'true');
-            innerCore.setAttribute('opacity', '0.6');
-            innerCore.setAttribute('animation', 'property: rotation; to: 360 0 360; loop: true; dur: 6000');
+            // Внутрішня частина
+            const innerSphere = document.createElement('a-sphere');
+            innerSphere.setAttribute('radius', '0.2');
+            innerSphere.setAttribute('color', '#9370DB');
+            innerSphere.setAttribute('transparent', 'true');
+            innerSphere.setAttribute('opacity', '0.6');
 
-            // Sparkling effect
-            const sparkleEffect = document.createElement('a-sphere');
-            sparkleEffect.setAttribute('radius', '0.45');
-            sparkleEffect.setAttribute('color', '#FFFFFF');
-            sparkleEffect.setAttribute('transparent', 'true');
-            sparkleEffect.setAttribute('opacity', '0.3');
-            sparkleEffect.setAttribute('wireframe', 'true');
-            sparkleEffect.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 12000');
-
-            // Floating particles
-            for (let i = 0; i < 8; i++) {
-                const angle = (i / 8) * Math.PI * 2;
-                const particle = document.createElement('a-sphere');
-                particle.setAttribute('radius', '0.02');
-                particle.setAttribute('color', i % 2 === 0 ? '#FF69B4' : '#9370DB');
-                particle.setAttribute('position', `${Math.cos(angle) * 0.6} ${Math.sin(angle) * 0.6} 0`);
-                particle.setAttribute('animation', `
-                    property: position;
-                    to: ${Math.cos(angle) * 0.7} ${Math.sin(angle) * 0.7} 0;
-                    dir: alternate;
-                    loop: true;
-                    dur: ${2000 + i * 300};
-                `);
-                target.appendChild(particle);
-            }
-
-            // Click handler for magic prophecies
-            function handleMagicClick() {
-                // Ball animation
-                sphere.setAttribute('animation', `
-                    property: scale;
-                    to: 1.3 1.3 1.3;
-                    dur: 300;
-                    dir: alternate;
-                `);
-
-                // Magical color change
-                const colors = ['#FF69B4', '#9370DB', '#BA55D3', '#FF1493', '#8A2BE2'];
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                sphere.setAttribute('color', randomColor);
-
-                // Sound effect
-                if (isSoundOn) {
-                    const magicSound = new Audio('fon.mp3');
-                    magicSound.volume = 0.2;
-                    magicSound.play().catch(() => {});
-                }
-
-                // Show random prophecy
-                const randomProphecy = prophecies[currentLanguage][Math.floor(Math.random() * prophecies[currentLanguage].length)];
+            // Обробник кліку
+            function handleClick() {
+                const randomProphecy = prophecies[currentLanguage][
+                    Math.floor(Math.random() * prophecies[currentLanguage].length)
+                ];
                 document.getElementById('prophecy-display').textContent = randomProphecy;
-
-                // Create sparkle effect
                 createSparkles();
+                
+                // Анімація
+                sphere.setAttribute('animation', 'property: scale; to: 1.2 1.2 1.2; dur: 300; dir: alternate');
+                
+                // Зміна кольору
+                const colors = ['#FF69B4', '#9370DB', '#BA55D3'];
+                sphere.setAttribute('color', colors[Math.floor(Math.random() * colors.length)]);
             }
 
-            // Add click events to all ball elements
-            sphere.addEventListener('click', handleMagicClick);
-            innerCore.addEventListener('click', handleMagicClick);
-            sparkleEffect.addEventListener('click', handleMagicClick);
+            sphere.addEventListener('click', handleClick);
+            innerSphere.addEventListener('click', handleClick);
 
-            // Add all elements to target
             target.appendChild(sphere);
-            target.appendChild(innerCore);
-            target.appendChild(sparkleEffect);
-
+            target.appendChild(innerSphere);
             scene.appendChild(target);
 
-            // Add scene to container
+            // Додаємо сцену
             const arContainer = document.getElementById('ar-scene');
             arContainer.appendChild(scene);
 
-            console.log('Magic AR initialized - ball appears automatically when marker found!');
+            console.log('AR initialized successfully!');
         }
 
-        // Initialize when page loads
+        // Запускаємо при завантаженні
         document.addEventListener('DOMContentLoaded', function() {
             createSparkles();
-            initializeAR();
+            setTimeout(initializeAR, 1000);
+        });
+
+        // Обробка помилок
+        window.addEventListener('error', function(e) {
+            console.log('Error occurred:', e.error);
         });
     </script>
 </body>
 </html>
-
