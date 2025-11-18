@@ -44,10 +44,34 @@
             border: 2px solid gold;
         }
         
-        .marker-link {
-            color: #4ecdc4;
-            text-decoration: underline;
+        .ball-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffd700;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .audio-control {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            z-index: 1000;
             cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -56,10 +80,19 @@
         <h3>AR Магічна Куля</h3>
         <p>1. Наведіть камеру на маркер</p>
         <p>2. Натисніть на кулю для пророцтва</p>
-        <p>Маркер: <span class="marker-link" onclick="downloadMarker()">Завантажити</span></p>
+        <p>Маркер: ваш marker.patt</p>
     </div>
     
+    <div class="audio-control" onclick="toggleAudio()">🔊</div>
+    
     <div class="prophecy-text" id="prophecyText"></div>
+    <div class="ball-text" id="ballText">Натисни</div>
+
+    <!-- Фонова музика -->
+    <audio id="backgroundMusic" loop>
+        <source src="assets/fon.mp3" type="audio/mpeg">
+        Ваш браузер не підтримує аудіо елемент.
+    </audio>
 
     <a-scene 
         vr-mode-ui="enabled: false"
@@ -69,6 +102,7 @@
         cursor="rayOrigin: mouse"
         raycaster="objects: .clickable">
         
+        <!-- Використовуємо ваш маркер -->
         <a-marker type="pattern" url="assets/marker.patt">
             <!-- Основна куля -->
             <a-sphere 
@@ -104,16 +138,6 @@
                 
                 <!-- Частинки -->
                 <a-entity id="particles-container"></a-entity>
-                
-                <!-- Текст -->
-                <a-text 
-                    id="prophecy"
-                    value="Натисни"
-                    align="center"
-                    position="0 0 0.6"
-                    color="#ffd700"
-                    scale="2 2 2">
-                </a-text>
             </a-sphere>
             
             <!-- Підставка -->
@@ -144,23 +168,31 @@
 
     <script>
         const prophecies = [
-            "Твоє майбутнє сяє яскраво!",
-            "Несподівана зустріч змінить все!",
-            "Вір у себе - ти можеш все!",
-            "Найкращі моменти ще попереду!",
-            "Ти знайдеш відповіді!",
-            "Нове захоплення чекає на тебе!",
-            "Подорож відкриє нові горизонти!",
-            "Наполегливість буде винагороджена!",
-            "Зустріч з другом принесе радість!",
-            "Творчість розкриється повністю!"
+            "Твоє майбутнє сяє яскраво! ✨",
+            "Несподівана зустріч змінить все! 🔮",
+            "Вір у себе - ти можеш все! 💫",
+            "Найкращі моменти ще попереду! 🌟",
+            "Ти знайдеш відповіді! 🔍",
+            "Нове захоплення чекає на тебе! 🎯",
+            "Подорож відкриє нові горизонти! 🗺️",
+            "Наполегливість буде винагороджена! 🏆",
+            "Зустріч з другом принесе радість! 👥",
+            "Творчість розкриється повністю! 🎨",
+            "Фінансове благополуччя близько! 💰",
+            "Знайдеш спокій серед хаосу! ☮️",
+            "Нова можливість несподівано з'явиться! 🚀",
+            "Доброта повернеться подвійно! ❤️",
+            "Відкриття змінить твій світ! 🌍"
         ];
+        
+        let audioEnabled = false;
+        const backgroundMusic = document.getElementById('backgroundMusic');
         
         function createParticles() {
             const container = document.getElementById('particles-container');
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 8; i++) {
                 const particle = document.createElement('a-sphere');
-                particle.setAttribute('radius', '0.02');
+                particle.setAttribute('radius', '0.03');
                 particle.setAttribute('color', getRandomColor());
                 particle.setAttribute('position', getRandomPosition(0.6));
                 particle.setAttribute('animation', {
@@ -180,20 +212,22 @@
                 {x: 0.8, y: -0.3, z: 0},
                 {x: -0.8, y: -0.3, z: 0},
                 {x: 0, y: -0.3, z: 0.8},
-                {x: 0, y: -0.3, z: -0.8}
+                {x: 0, y: -0.3, z: -0.8},
+                {x: 0.6, y: -0.3, z: 0.6},
+                {x: -0.6, y: -0.3, z: -0.6}
             ];
             
             positions.forEach(pos => {
                 const crystal = document.createElement('a-cone');
-                crystal.setAttribute('radius-bottom', '0.04');
+                crystal.setAttribute('radius-bottom', '0.05');
                 crystal.setAttribute('radius-top', '0.01');
-                crystal.setAttribute('height', '0.15');
+                crystal.setAttribute('height', '0.2');
                 crystal.setAttribute('color', getRandomCrystalColor());
                 crystal.setAttribute('position', pos);
                 crystal.setAttribute('animation', {
                     property: 'rotation',
                     to: '0 360 0',
-                    dur: 3000 + Math.random() * 3000,
+                    dur: 4000 + Math.random() * 4000,
                     loop: true
                 });
                 container.appendChild(crystal);
@@ -201,12 +235,12 @@
         }
         
         function getRandomColor() {
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#feca57'];
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
             return colors[Math.floor(Math.random() * colors.length)];
         }
         
         function getRandomCrystalColor() {
-            const colors = ['#ffd700', '#c0c0c0', '#b9f2ff'];
+            const colors = ['#ffd700', '#c0c0c0', '#b9f2ff', '#ff69b4', '#98fb98'];
             return colors[Math.floor(Math.random() * colors.length)];
         }
         
@@ -223,15 +257,40 @@
             return prophecies[Math.floor(Math.random() * prophecies.length)];
         }
         
+        function toggleAudio() {
+            const audioControl = document.querySelector('.audio-control');
+            if (audioEnabled) {
+                backgroundMusic.pause();
+                audioControl.textContent = '🔇';
+                audioEnabled = false;
+            } else {
+                backgroundMusic.play().catch(e => {
+                    console.log('Автовідтворення заблоковано, натисніть ще раз');
+                });
+                audioControl.textContent = '🔊';
+                audioEnabled = true;
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             const magicBall = document.getElementById('magicBall');
-            const prophecyElement = document.getElementById('prophecy');
+            const ballText = document.getElementById('ballText');
             const prophecyText = document.getElementById('prophecyText');
             
             createParticles();
             createCrystals();
             
+            // Автоматичне включення аудіо при взаємодії
+            document.addEventListener('click', function() {
+                if (!audioEnabled) {
+                    backgroundMusic.play().catch(e => {
+                        console.log('Автовідтворення заблоковано');
+                    });
+                }
+            }, { once: true });
+            
             magicBall.addEventListener('click', function() {
+                // Анімація кулі
                 magicBall.setAttribute('animation', {
                     property: 'scale',
                     from: '1 1 1',
@@ -241,27 +300,25 @@
                     dir: 'alternate'
                 });
                 
+                // Зміна кольору
                 magicBall.setAttribute('color', '#4a148c');
                 
+                // Отримання пророцтва
                 const prophecy = getRandomProphecy();
-                prophecyElement.setAttribute('value', prophecy);
+                ballText.textContent = prophecy;
                 
+                // Показ тексту пророцтва на екрані
                 prophecyText.textContent = prophecy;
                 prophecyText.style.display = 'block';
                 
+                // Автоматичне приховування через 5 секунд
                 setTimeout(() => {
                     prophecyText.style.display = 'none';
                     magicBall.setAttribute('color', '#1a1a2e');
+                    ballText.textContent = "Натисни";
                 }, 5000);
             });
         });
-        
-        function downloadMarker() {
-            const link = document.createElement('a');
-            link.href = 'https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png';
-            link.download = 'magic-ball-marker.png';
-            link.click();
-        }
     </script>
 </body>
 </html>
