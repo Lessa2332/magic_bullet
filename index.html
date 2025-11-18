@@ -1,21 +1,17 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Різдвяна Магічна Куля</title>
-    <!-- ПРАВИЛЬНИЙ ПОРЯДОК: спочатку A-Frame, потім MindAR -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
-    <!-- Видаляємо непотрібні скрипти -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-face.prod.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Christmas Magic Ball</title>
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -24,119 +20,155 @@
             color: white;
             overflow-x: hidden;
             min-height: 100vh;
+            touch-action: pan-y;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
 
         .header {
             text-align: center;
-            padding: 30px 0;
+            padding: 20px 15px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            margin-bottom: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
             backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: 2px solid white;
+            border-radius: 15px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: #1a2a6c;
         }
 
         .title {
-            font-size: 3em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
+            margin-bottom: 8px;
             text-shadow: 0 0 20px #ff0080;
             animation: glow 2s ease-in-out infinite alternate;
+            padding: 0 50px;
         }
 
         .subtitle {
-            font-size: 1.5em;
+            font-size: 1em;
             opacity: 0.9;
         }
 
         .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: start;
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .ar-section {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 15px;
             backdrop-filter: blur(10px);
+            order: 1;
         }
 
         #ar-scene {
             width: 100%;
-            height: 500px;
-            border-radius: 15px;
+            height: 60vh;
+            min-height: 400px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            position: relative;
         }
 
         .instructions {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 20px;
             backdrop-filter: blur(10px);
+            order: 2;
         }
 
         .instructions h2 {
             color: #ffeb3b;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
+            font-size: 1.3em;
         }
 
         .step {
             display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 15px;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            transition: transform 0.3s ease;
-        }
-
-        .step:hover {
-            transform: translateX(10px);
+            border-radius: 12px;
         }
 
         .step-number {
             background: #ff0080;
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            margin-right: 15px;
+            margin-right: 12px;
             flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .step p {
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
         }
 
         .wishes {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 30px;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
             backdrop-filter: blur(10px);
+            order: 3;
         }
 
         .wish-item {
             background: linear-gradient(45deg, rgba(255, 0, 128, 0.3), rgba(0, 255, 255, 0.3));
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            border-left: 5px solid #ff0080;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 12px;
+            border-left: 4px solid #ff0080;
             animation: float 3s ease-in-out infinite;
+        }
+
+        .wish-item p {
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
         }
 
         .wish-item:nth-child(even) {
@@ -146,56 +178,137 @@
 
         .loading {
             text-align: center;
-            padding: 50px;
-            font-size: 1.5em;
+            padding: 40px 20px;
+            font-size: 1.1em;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
         }
 
         .control-panel {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin-top: 15px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 10px 16px;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             background: linear-gradient(45deg, #ff0080, #00ffff);
             color: white;
             cursor: pointer;
             font-weight: bold;
-            transition: transform 0.3s ease;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            min-width: 80px;
         }
 
-        .btn:hover {
-            transform: scale(1.1);
+        .btn:active {
+            transform: scale(0.95);
         }
 
         .movement-instructions {
             background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: 15px;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
             text-align: center;
+            font-size: 13px;
+        }
+
+        .magic-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ff0080;
+            border-radius: 50%;
+            animation: particle-float 3s ease-in-out infinite;
         }
 
         @keyframes glow {
-            from {
-                text-shadow: 0 0 20px #ff0080;
-            }
-            to {
-                text-shadow: 0 0 30px #00ffff, 0 0 40px #ff0080;
-            }
+            from { text-shadow: 0 0 20px #ff0080; }
+            to { text-shadow: 0 0 30px #00ffff, 0 0 40px #ff0080; }
         }
 
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes particle-float {
+            0%, 100% { 
+                transform: translateY(0) translateX(0) scale(1);
+                opacity: 0.7;
             }
-            50% {
-                transform: translateY(-10px);
+            25% { 
+                transform: translateY(-20px) translateX(10px) scale(1.2);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateY(-40px) translateX(-5px) scale(0.8);
+                opacity: 0.5;
+            }
+            75% { 
+                transform: translateY(-20px) translateX(-10px) scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.5em;
+                padding: 0 40px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                min-width: 70px;
+            }
+            
+            #ar-scene {
+                height: 50vh;
+                min-height: 350px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+            
+            .ar-section {
+                flex: 1;
+                order: 1;
+            }
+            
+            .instructions {
+                flex: 1;
+                order: 2;
+            }
+            
+            .wishes {
+                order: 3;
             }
         }
     </style>
@@ -203,256 +316,352 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1 class="title">🎄 Різдвяна Магічна Куля ✨</h1>
-            <p class="subtitle">Поклади маркер на підлогу та обіди магічну кулю навколо!</p>
+            <div class="language-switcher">
+                <button class="lang-btn active" onclick="switchLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="switchLanguage('uk')">UK</button>
+            </div>
+            
+            <div id="en-content">
+                <h1 class="title">🎄 Magic Ball ✨</h1>
+                <p class="subtitle">Place marker & explore the magic!</p>
+            </div>
+            
+            <div id="uk-content" class="hidden">
+                <h1 class="title">🎄 Магічна Куля ✨</h1>
+                <p class="subtitle">Поклади маркер та досліджуй магію!</p>
+            </div>
         </header>
 
         <div class="content">
             <div class="ar-section">
                 <div id="ar-scene">
-                    <div class="loading">
-                        <p>🔄 Завантаження магії...</p>
-                        <p>Будь ласка, дай доступ до камери</p>
+                    <div id="en-loading" class="loading">
+                        <p>🔄 Loading Magic...</p>
+                        <p>Tap "Start AR" & allow camera</p>
+                    </div>
+                    
+                    <div id="uk-loading" class="loading hidden">
+                        <p>🔄 Завантаження...</p>
+                        <p>Натисни "Старт AR" та дозволь камеру</p>
                     </div>
                 </div>
                 
-                <div class="movement-instructions">
-                    <p>🎮 <strong>Керування:</strong></p>
-                    <p>📱 <strong>Мобільний:</strong> Нахиляй пристрій для переміщення</p>
-                    <p>💻 <strong>Комп'ютер:</strong> Клавіші W,A,S,D для руху</p>
+                <div id="en-movement" class="movement-instructions">
+                    <p>📱 <strong>Mobile:</strong> Move around marker</p>
+                    <p>💫 <strong>Tap the ball</strong> for wishes!</p>
+                </div>
+                
+                <div id="uk-movement" class="movement-instructions hidden">
+                    <p>📱 <strong>Мобільний:</strong> Рухайся навколо маркера</p>
+                    <p>💫 <strong>Торкай кулі</strong> для побажань!</p>
                 </div>
                 
                 <div class="control-panel">
-                    <button class="btn" onclick="startAR()">▶️ Старт AR</button>
-                    <button class="btn" onclick="stopAR()">⏹️ Стоп AR</button>
-                    <button class="btn" onclick="toggleSound()">🔊 Звук</button>
-                    <button class="btn" onclick="resetPosition()">🔄 Скинути позицію</button>
+                    <div id="en-buttons">
+                        <button class="btn" onclick="startAR()">▶️ Start</button>
+                        <button class="btn" onclick="stopAR()">⏹️ Stop</button>
+                        <button class="btn" onclick="toggleSound()">🔊 Sound</button>
+                    </div>
+                    
+                    <div id="uk-buttons" class="hidden">
+                        <button class="btn" onclick="startAR()">▶️ Старт</button>
+                        <button class="btn" onclick="stopAR()">⏹️ Стоп</button>
+                        <button class="btn" onclick="toggleSound()">🔊 Звук</button>
+                    </div>
                 </div>
             </div>
 
             <div class="instructions">
-                <h2>📖 Як досліджувати кулю:</h2>
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <p>Поклади маркер на рівну поверхню підлоги</p>
+                <div id="en-instructions">
+                    <h2>🎯 How to Play:</h2>
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <p>Tap "Start" & allow camera access</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <p>Point camera at the marker</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <p>Magic ball will appear!</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <p>Tap the ball - get wishes! ✨</p>
+                    </div>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <p>Наведи камеру на маркер зверху</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <p>Підійди ближче - куля збільшиться</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <p>Обіди навколо - побач кулю з усіх боків!</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <p>Натисни на кулю - отримай різдвяне побажання</p>
+                
+                <div id="uk-instructions" class="hidden">
+                    <h2>🎯 Як грати:</h2>
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <p>Натисни "Старт" та дозволь камеру</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <p>Наведи камеру на маркер</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <p>З'явиться магічна куля!</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <p>Торкай кулі - отримуй побажання! ✨</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="wishes">
-            <h2 style="text-align: center; color: #ffeb3b; margin-bottom: 20px;">
-                🌟 Різдвяні Побажання для Тебе!
-            </h2>
-            <div class="wish-item">
-                <p>Нехай цього Різдва твої очі сяють від радощів, а серце наповниться дивуванням від кожного святкового моменту!</p>
+            <div id="en-wishes">
+                <h2 style="text-align: center; color: #ffeb3b; margin-bottom: 15px;">
+                    🌟 Christmas Wishes!
+                </h2>
+                <div class="wish-item">
+                    <p>May your eyes shine with joy this Christmas!</p>
+                </div>
+                <div class="wish-item">
+                    <p>Magical gifts under the Christmas tree!</p>
+                </div>
+                <div class="wish-item">
+                    <p>Christmas star light your path to adventures!</p>
+                </div>
             </div>
-            <div class="wish-item">
-                <p>Бажаю, щоб під ялинкою тебе чекали найчарівніші подарунки, а Дід Мороз приніс мрії, які збуваються!</p>
-            </div>
-            <div class="wish-item">
-                <p>Хай різдвяна зірка освітить твій шлях до цікавих пригод і нових друзів у наступному році!</p>
-            </div>
-            <div class="wish-item">
-                <p>Нехай кожна сніжинка принесе тобі трохи магії, а кожна різдвяна пісня навчить співати від щастя!</p>
-            </div>
-            <div class="wish-item">
-                <p>Бажаю, щоб ці свята наповнили твій дім сміхом, теплом родини та ароматом домашніх печив!</p>
+            
+            <div id="uk-wishes" class="hidden">
+                <h2 style="text-align: center; color: #ffeb3b; margin-bottom: 15px;">
+                    🌟 Різдвяні Побажання!
+                </h2>
+                <div class="wish-item">
+                    <p>Нехай очі сяють від радощів цього Різдва!</p>
+                </div>
+                <div class="wish-item">
+                    <p>Чарівні подарунки під ялинкою!</p>
+                </div>
+                <div class="wish-item">
+                    <p>Хай зірка освітить шлях до пригод!</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Масив побажань
-        const wishes = [
-            "Нехай цього Різдва твої очі сяють від радощів, а серце наповниться дивуванням від кожного святкового моменту!",
-            "Бажаю, щоб під ялинкою тебе чекали найчарівніші подарунки, а Дід Мороз приніс мрії, які збуваються!",
-            "Хай різдвяна зірка освітить твій шлях до цікавих пригод і нових друзів у наступному році!",
-            "Нехай кожна сніжинка принесе тобі трохи магії, а кожна різдвяна пісня навчить співати від щастя!",
-            "Бажаю, щоб ці свята наповнили твій дім сміхом, теплом родини та ароматом домашніх печив!"
-        ];
+        // Language management
+        let currentLanguage = 'en';
+        
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update language buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.lang-btn[onclick="switchLanguage('${lang}')"]`).classList.add('active');
+            
+            // Show/hide content
+            document.querySelectorAll('[id$="-content"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${lang}-content`).classList.remove('hidden');
+            
+            document.querySelectorAll('[id$="-loading"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${lang}-loading`).classList.remove('hidden');
+            
+            document.querySelectorAll('[id$="-movement"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${lang}-movement`).classList.remove('hidden');
+            
+            document.querySelectorAll('[id$="-buttons"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${lang}-buttons`).classList.remove('hidden');
+            
+            document.querySelectorAll('[id$="-instructions"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${lang}-instructions`).classList.remove('hidden');
+            
+            document.querySelectorAll('[id$="-wishes"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${lang}-wishes`).classList.remove('hidden');
+        }
 
-        // Аудіо менеджер
+        // Wishes in both languages
+        const wishes = {
+            en: [
+                "May your eyes shine with joy this Christmas! ✨",
+                "Magical gifts under the Christmas tree! 🎁",
+                "Christmas star light your path to adventures! ⭐",
+                "Snowflakes bring you magic! ❄️",
+                "Home filled with laughter & warmth! 🏠"
+            ],
+            uk: [
+                "Нехай очі сяють від радощів цього Різдва! ✨",
+                "Чарівні подарунки під ялинкою! 🎁",
+                "Хай зірка освітить шлях до пригод! ⭐",
+                "Сніжинки приносять тобі магію! ❄️",
+                "Дім наповнений сміхом та теплом! 🏠"
+            ]
+        };
+
+        // Audio manager
         const audio = new Audio('fon.mp3');
         audio.loop = true;
-        let isSoundOn = true;
+        let isSoundOn = false;
         let currentScene = null;
 
         function toggleSound() {
             isSoundOn = !isSoundOn;
             if (isSoundOn) {
-                audio.play();
+                audio.play().catch(e => console.log("Audio error"));
             } else {
                 audio.pause();
             }
         }
 
-        function resetPosition() {
-            if (currentScene) {
-                const camera = currentScene.querySelector('a-camera');
-                if (camera) {
-                    camera.setAttribute('position', '0 1.6 0');
-                    camera.setAttribute('rotation', '0 0 0');
-                }
+        // Create magic particles
+        function createMagicParticles() {
+            const container = document.getElementById('ar-scene');
+            const effects = document.createElement('div');
+            effects.className = 'magic-effects';
+            
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.background = i % 3 === 0 ? '#ff0080' : i % 3 === 1 ? '#00ffff' : '#ffff00';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+                effects.appendChild(particle);
             }
+            
+            container.appendChild(effects);
         }
 
-        // Спрощена AR сцена без джойстика
+        // AR scene
         function startAR() {
+            createMagicParticles();
+            
             const scene = document.createElement('a-scene');
             currentScene = scene;
             
-            scene.setAttribute('mindar-image', {
-                imageTargetSrc: 'assets/marker.mind',
-                maxTrack: 1,
-                filterMinCF: 0.001,
-                filterBeta: 1000
-            });
-            scene.setAttribute('color-space', 'sRGB');
+            // Simple MindAR configuration
+            scene.setAttribute('mindar-image', `
+                imageTargetSrc: assets/marker.mind;
+                maxTrack: 1;
+                filterMinCF: 0.001;
+                filterBeta: 1000;
+            `);
             scene.setAttribute('embedded', '');
-            scene.setAttribute('renderer', 'colorManagement: true, physicallyCorrectLights');
-            scene.setAttribute('cursor', 'rayOrigin: mouse');
+            scene.setAttribute('renderer', 'colorManagement: true;');
+            scene.setAttribute('loading-screen', 'enabled: false;');
 
-            // Спрощена камера
+            // Camera
             const camera = document.createElement('a-camera');
-            camera.setAttribute('position', '0 1.6 0');
-            camera.setAttribute('look-controls', 'enabled: false');
+            camera.setAttribute('position', '0 0 0');
+            camera.setAttribute('look-controls', 'enabled: true');
+            camera.setAttribute('cursor', 'rayOrigin: mouse; fuse: false;');
             scene.appendChild(camera);
 
-            // Створюємо магічну кулю
+            // Target
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
-            // ОСНОВНА КУЛЯ (сфера)
+            // MAGIC BALL - centered on marker
             const sphere = document.createElement('a-sphere');
-            sphere.setAttribute('radius', '0.8');
-            sphere.setAttribute('position', '0 0 0');
+            sphere.setAttribute('radius', '0.3');
             sphere.setAttribute('color', '#ff0080');
             sphere.setAttribute('transparent', 'true');
-            sphere.setAttribute('opacity', '0.8');
-            sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000');
+            sphere.setAttribute('opacity', '0.9');
+            sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 8000');
+            sphere.setAttribute('class', 'clickable');
 
-            // ВНУТРІШНЯ СТРУКТУРА
-            const innerCube = document.createElement('a-box');
-            innerCube.setAttribute('width', '1');
-            innerCube.setAttribute('height', '1');
-            innerCube.setAttribute('depth', '1');
-            innerCube.setAttribute('position', '0 0 0');
-            innerCube.setAttribute('color', '#00ffff');
-            innerCube.setAttribute('transparent', 'true');
-            innerCube.setAttribute('opacity', '0.3');
-            innerCube.setAttribute('wireframe', 'true');
-            innerCube.setAttribute('animation', 'property: rotation; to: 360 360 360; loop: true; dur: 15000');
+            // Inner glow
+            const innerGlow = document.createElement('a-sphere');
+            innerGlow.setAttribute('radius', '0.25');
+            innerGlow.setAttribute('color', '#00ffff');
+            innerGlow.setAttribute('transparent', 'true');
+            innerGlow.setAttribute('opacity', '0.6');
+            innerGlow.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 6000');
 
-            // ЗОВНІШНЯ ПІРАМІДА
-            const outerPyramid = document.createElement('a-cone');
-            outerPyramid.setAttribute('radius-bottom', '1.2');
-            outerPyramid.setAttribute('radius-top', '0.1');
-            outerPyramid.setAttribute('height', '1.5');
-            outerPyramid.setAttribute('position', '0 0 0');
-            outerPyramid.setAttribute('color', '#ffff00');
-            outerPyramid.setAttribute('transparent', 'true');
-            outerPyramid.setAttribute('opacity', '0.2');
-            outerPyramid.setAttribute('wireframe', 'true');
-            outerPyramid.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000');
+            // Outer ring
+            const ring = document.createElement('a-ring');
+            ring.setAttribute('radius-inner', '0.35');
+            ring.setAttribute('radius-outer', '0.4');
+            ring.setAttribute('color', '#ffff00');
+            ring.setAttribute('transparent', 'true');
+            ring.setAttribute('opacity', '0.7');
+            ring.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 4000');
 
-            // Додаємо всі елементи
+            // Add all elements to target
             target.appendChild(sphere);
-            target.appendChild(innerCube);
-            target.appendChild(outerPyramid);
-            scene.appendChild(target);
+            target.appendChild(innerGlow);
+            target.appendChild(ring);
 
-            // ФУНКЦІЯ ДЛЯ СТВОРЕННЯ ТЕКСТУ
+            // Wish text directly on the ball
             let currentWishIndex = 0;
-            let wishText3D = null;
+            const wishText = document.createElement('a-text');
+            wishText.setAttribute('value', currentLanguage === 'en' ? 'Tap me! ✨' : 'Торкайся! ✨');
+            wishText.setAttribute('color', '#FFFFFF');
+            wishText.setAttribute('align', 'center');
+            wishText.setAttribute('position', '0 0.6 0');
+            wishText.setAttribute('width', '1.5');
+            wishText.setAttribute('class', 'wish-text');
+            target.appendChild(wishText);
 
-            function createWishText(wishText) {
-                if (wishText3D) {
-                    target.removeChild(wishText3D);
+            // Click handler
+            function handleClick() {
+                // Ball animation
+                sphere.setAttribute('animation', `
+                    property: scale;
+                    to: 1.5 1.5 1.5;
+                    dur: 300;
+                    dir: alternate;
+                `);
+
+                // Sound
+                if (isSoundOn) {
+                    const clickSound = new Audio('fon.mp3');
+                    clickSound.volume = 0.1;
+                    clickSound.play().catch(() => {});
                 }
 
-                wishText3D = document.createElement('a-text');
-                wishText3D.setAttribute('value', wishText);
-                wishText3D.setAttribute('color', '#FFD700');
-                wishText3D.setAttribute('align', 'center');
-                wishText3D.setAttribute('position', '0 1.5 0');
-                wishText3D.setAttribute('width', '2.5');
-                wishText3D.setAttribute('animation', 'property: position; to: 0 1.8 0; loop: true; dir: alternate; dur: 2000');
+                // Update wish text
+                currentWishIndex = (currentWishIndex + 1) % wishes[currentLanguage].length;
+                wishText.setAttribute('value', wishes[currentLanguage][currentWishIndex]);
                 
-                const textBackground = document.createElement('a-plane');
-                textBackground.setAttribute('position', '0 1.5 0');
-                textBackground.setAttribute('width', '2.7');
-                textBackground.setAttribute('height', '0.7');
-                textBackground.setAttribute('color', '#000000');
-                textBackground.setAttribute('opacity', '0.7');
-                
-                target.appendChild(textBackground);
-                target.appendChild(wishText3D);
+                // Color change
+                const colors = ['#ff0080', '#00ffff', '#ffff00', '#ff00ff', '#00ff00'];
+                sphere.setAttribute('color', colors[currentWishIndex % colors.length]);
             }
 
-            // ОБРОБНИКИ КЛІКУ
-            function addClickHandler(element) {
-                element.addEventListener('click', function() {
-                    element.setAttribute('animation', {
-                        property: 'scale',
-                        to: '1.2 1.2 1.2',
-                        dur: 300,
-                        dir: 'alternate'
-                    });
+            // Add event listeners
+            sphere.addEventListener('click', handleClick);
+            innerGlow.addEventListener('click', handleClick);
+            ring.addEventListener('click', handleClick);
 
-                    if (isSoundOn) {
-                        const clickSound = new Audio('fon.mp3');
-                        clickSound.volume = 0.3;
-                        clickSound.play();
-                    }
+            scene.appendChild(target);
 
-                    currentWishIndex = (currentWishIndex + 1) % wishes.length;
-                    createWishText(wishes[currentWishIndex]);
-                });
-            }
-
-            addClickHandler(sphere);
-            addClickHandler(innerCube);
-            addClickHandler(outerPyramid);
-
-            // ПОЧАТКОВИЙ ТЕКСТ
-            createWishText("Натисни на кулю!");
-
-            // ЗАМІНА СЦЕНИ
+            // Replace scene
             const arContainer = document.getElementById('ar-scene');
             arContainer.innerHTML = '';
             arContainer.appendChild(scene);
 
-            if (isSoundOn) {
-                audio.play();
-            }
+            console.log('AR started!');
         }
 
         function stopAR() {
             const arContainer = document.getElementById('ar-scene');
-            arContainer.innerHTML = '<div class="loading"><p>🔄 AR зупинено</p><p>Натисни "Старт AR" щоб продовжити</p></div>';
-            audio.pause();
+            const loadingHTML = currentLanguage === 'en' 
+                ? '<div class="loading"><p>🔄 AR Stopped</p><p>Tap "Start" to continue</p></div>'
+                : '<div class="loading"><p>🔄 AR Зупинено</p><p>Натисни "Старт" щоб продовжити</p></div>';
+            
+            arContainer.innerHTML = loadingHTML;
+            createMagicParticles();
+            
+            if (isSoundOn) {
+                audio.pause();
+            }
         }
 
-        // ІНІЦІАЛІЗАЦІЯ
+        // Initialize magic particles
         document.addEventListener('DOMContentLoaded', function() {
-            // Автоматичний старт при завантаженні (опційно)
-            // startAR();
+            createMagicParticles();
         });
     </script>
 </body>
