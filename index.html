@@ -6,77 +6,20 @@
     <title>🎄 Різдвяна Магічна Куля</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
-
-    <!-- 🔮 Кастомний шейдер "скло" -->
-    <script>
-      AFRAME.registerShader('glass', {
-        schema: {
-          color: { type: 'color', default: '#00b0ff' },
-          opacity: { type: 'number', default: 0.35 },
-          shininess: { type: 'number', default: 100 }
-        },
-        vertexShader: `
-          varying vec3 vNormal;
-          varying vec3 vPosition;
-          void main() {
-            vNormal = normalize(normalMatrix * normal);
-            vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
-            gl_Position = projectionMatrix * vec4(vPosition, 1.0);
-          }
-        `,
-        fragmentShader: `
-          varying vec3 vNormal;
-          varying vec3 vPosition;
-          uniform vec3 color;
-          uniform float opacity;
-          uniform float shininess;
-          void main() {
-            vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
-            float diff = max(dot(normalize(vNormal), lightDir), 0.1);
-            vec3 diffuse = diff * color;
-
-            vec3 viewDir = normalize(-vPosition);
-            vec3 reflectDir = reflect(-lightDir, normalize(vNormal));
-            float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-            vec3 specular = spec * vec3(1.0, 1.0, 1.0);
-
-            gl_FragColor = vec4(mix(diffuse, specular, 0.3), opacity);
-          }
-        `
-      });
-    </script>
-
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; overflow: hidden; background: transparent; color: white; }
-        a-scene { position: fixed; top: 0; left: 0; width: 100% !important; height: 100% !important; background: transparent; }
-        .loader {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(10, 15, 44, 0.8); z-index: 1000; text-align: center; padding: 20px;
+        html, body { 
+            width: 100%; height: 100%; overflow: hidden; 
+            background: #000; /* чорний, бо відео перекриє */
         }
-        .loader h1 {
-            font-size: 2em; margin-bottom: 15px;
-            text-shadow: 0 0 15px #00b0ff;
-            animation: glow 2s infinite alternate;
-        }
-        @keyframes glow {
-            to { text-shadow: 0 0 25px #ff00ff, 0 0 35px #00b0ff; }
-        }
-        .sound-btn {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            padding: 12px 24px; border: none; border-radius: 24px;
-            background: linear-gradient(45deg, #00b0ff, #ff00ff); color: white;
-            font-weight: bold; cursor: pointer; z-index: 1001;
+        a-scene { 
+            position: fixed; top: 0; left: 0; 
+            width: 100% !important; height: 100% !important; 
+            background: transparent; 
         }
     </style>
 </head>
 <body>
-    <div class="loader" id="loader">
-        <h1>🎄 Різдвяна Магічна Куля</h1>
-        <p>Наведи камеру на маркер!</p>
-    </div>
-
     <a-scene
         mindar-image="imageTargetSrc: assets/marker.mind; maxTrack: 1"
         embedded
@@ -85,20 +28,31 @@
         device-orientation-permission-ui="enabled: false"
         loading-screen="enabled: false"
     >
+        <!-- Аудіо -->
         <a-assets>
             <audio id="bg-music" src="fon.mp3" preload="auto" loop></audio>
         </a-assets>
 
+        <!-- Камера -->
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
+        <!-- Маркер -->
         <a-entity mindar-image-target="targetIndex: 0">
-            <!-- 💎 СКЛЯНА КУЛЯ з кастомним шейдером -->
             <a-sphere
                 id="magic-sphere"
                 radius="0.8"
                 position="0 0 0"
-                material="shader: glass; color: #00b0ff; opacity: 0.35; shininess: 120"
-                side="double"
+                material="
+                    color: #00b0ff;
+                    transparent: true;
+                    opacity: 0.35;
+                    shader: standard;
+                    emissive: #0080ff;
+                    emissiveIntensity: 0.2;
+                    metalness: 0.1;
+                    roughness: 0.3;
+                    side: double
+                "
                 visible="false"
             >
                 <a-animation
@@ -106,20 +60,69 @@
                     to="0 360 0"
                     dur="10000"
                     repeat="indefinite"
-                    easing="linear"
                 ></a-animation>
             </a-sphere>
         </a-entity>
+
+        <!-- 💡 ЛОАДЕР (всередині сцени!) -->
+        <a-entity id="loader" position="0 0 -2" visible="true">
+            <a-plane 
+                width="3" height="2" 
+                color="#0a0f2c" 
+                opacity="0.85" 
+                side="double"
+                position="0 0 0"
+            ></a-plane>
+            <a-text 
+                value="🎄 Різдвяна Магічна Куля" 
+                position="0 0.4 0.01" 
+                align="center" 
+                color="#00b0ff" 
+                width="2.8"
+                font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+            ></a-text>
+            <a-text 
+                value="Наведи камеру на маркер!" 
+                position="0 -0.2 0.01" 
+                align="center" 
+                color="#ffffff" 
+                width="2.8"
+                font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+            ></a-text>
+        </a-entity>
+
+        <!-- 🔊 КНОПКА ЗВУКУ (всередині сцени!) -->
+        <a-entity id="sound-ui" position="0 -1.2 -2">
+            <a-plane 
+                id="sound-btn-bg" 
+                width="1.6" height="0.4" 
+                color="#00b0ff" 
+                opacity="0.9" 
+                side="double"
+                position="0 0 0"
+                cursor="rayOrigin: mouse"
+                animation__hover="property: scale; to: 1.1 1.1 1.1; startEvents: mouseenter; dur: 200"
+                animation__leave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+            ></a-plane>
+            <a-text 
+                id="sound-btn-text"
+                value="🔊 Увімкнути звук" 
+                position="0 0 0.01" 
+                align="center" 
+                color="#ffffff" 
+                width="1.5"
+                font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+            ></a-text>
+        </a-entity>
     </a-scene>
 
-    <button class="sound-btn" id="sound-btn">🔊 Увімкнути звук</button>
-
     <script>
+        let isTargetActive = false;
+        const bgMusic = document.getElementById('bg-music');
         const loader = document.getElementById('loader');
         const sphere = document.getElementById('magic-sphere');
-        const bgMusic = document.getElementById('bg-music');
-        const soundBtn = document.getElementById('sound-btn');
-        let isTargetActive = false;
+        const soundBtnBg = document.getElementById('sound-btn-bg');
+        const soundBtnText = document.getElementById('sound-btn-text');
 
         // Пророцтво
         function showProphecy() {
@@ -157,40 +160,51 @@
         if (target) {
             target.addEventListener('targetFound', () => {
                 isTargetActive = true;
-                loader.style.display = 'none';
+                loader.setAttribute('visible', 'false');
                 sphere.setAttribute('visible', 'true');
                 if (bgMusic.paused) {
                     bgMusic.play().catch(e => console.log("🔇 Audio failed:", e));
-                    soundBtn.textContent = '🔊 Вимкнути звук';
+                    soundBtnText.setAttribute('value', '🔊 Вимкнути звук');
                 }
             });
             target.addEventListener('targetLost', () => {
                 isTargetActive = false;
-                loader.style.display = 'flex';
+                loader.setAttribute('visible', 'true');
                 sphere.setAttribute('visible', 'false');
                 if (!bgMusic.paused) bgMusic.pause();
-                soundBtn.textContent = '🔊 Увімкнути звук';
+                soundBtnText.setAttribute('value', '🔊 Увімкнути звук');
             });
         }
 
-        // 🔥 Надійний клік на мобілці
+        // Клік по кулі → пророцтво
+        sphere.addEventListener('click', () => {
+            if (isTargetActive) {
+                showProphecy();
+            }
+        });
+
+        // Клік по кнопці звуку
+        soundBtnBg.addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play().catch(e => console.log("🔇 Audio failed:", e));
+                soundBtnText.setAttribute('value', '🔊 Вимкнути звук');
+            } else {
+                bgMusic.pause();
+                soundBtnText.setAttribute('value', '🔊 Увімкнути звук');
+            }
+        });
+
+        // 📱 Мобільний fallback: будь-яке торкання → пророцтво (якщо маркер активний)
         document.body.addEventListener('touchstart', (e) => {
             if (isTargetActive) {
                 e.preventDefault();
-                showProphecy();
+                // Не блокуємо, якщо торкнулися кнопки
+                const target = e.target;
+                if (target.id !== 'sound-btn-bg' && !target.closest('#sound-btn-bg')) {
+                    showProphecy();
+                }
             }
         }, { passive: false });
-
-        soundBtn.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                bgMusic.play().catch(e => console.log("🔇 Audio failed:", e));
-                soundBtn.textContent = '🔊 Вимкнути звук';
-            } else {
-                bgMusic.pause();
-                soundBtn.textContent = '🔊 Увімкнути звук';
-            }
-        });
     </script>
 </body>
 </html>
-
