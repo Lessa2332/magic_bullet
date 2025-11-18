@@ -16,9 +16,10 @@
 
         body {
             font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            /* Фон буде прихований під відеопотоком AR */
+            background: #0a0f2c;
             color: white;
-            overflow-x: hidden;
+            overflow: hidden;
             min-height: 100vh;
         }
 
@@ -26,143 +27,48 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 10;
         }
 
         .header {
             text-align: center;
-            padding: 30px 0;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            margin-bottom: 20px;
         }
 
         .title {
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px #ff0080;
-            animation: glow 2s ease-in-out infinite alternate;
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px #00b0ff;
         }
 
         .subtitle {
-            font-size: 1.5em;
-            opacity: 0.9;
-        }
-
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: start;
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
+            font-size: 1.1em;
+            opacity: 0.85;
         }
 
         .ar-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
+            background: rgba(10, 15, 44, 0.6);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(8px);
         }
 
         #ar-scene {
             width: 100%;
             height: 500px;
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .instructions {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .instructions h2 {
-            color: #ffeb3b;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .step {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            transition: transform 0.3s ease;
-        }
-
-        .step:hover {
-            transform: translateX(10px);
-        }
-
-        .step-number {
-            background: #ff0080;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 15px;
-            flex-shrink: 0;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
 
         .loading {
             text-align: center;
             padding: 50px;
-            font-size: 1.5em;
-        }
-
-        .snowflakes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .snowflake {
-            position: absolute;
-            color: #fff;
-            font-size: 1.5em;
-            animation: fall linear infinite;
-        }
-
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 20px #ff0080;
-            }
-            to {
-                text-shadow: 0 0 30px #00ffff, 0 0 40px #ff0080;
-            }
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-            }
+            font-size: 1.4em;
+            color: #00b0ff;
         }
 
         .control-panel {
@@ -173,99 +79,95 @@
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border: none;
-            border-radius: 25px;
-            background: linear-gradient(45deg, #ff0080, #00ffff);
+            border-radius: 24px;
+            background: linear-gradient(45deg, #00b0ff, #ff00ff);
             color: white;
             cursor: pointer;
             font-weight: bold;
-            transition: transform 0.3s ease;
+            transition: transform 0.2s;
         }
 
         .btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
-        .current-wish {
+        .instructions {
+            background: rgba(10, 15, 44, 0.6);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(8px);
+        }
+
+        .instructions h2 {
+            color: #4fc3f7;
+            margin-bottom: 15px;
             text-align: center;
-            padding: 15px;
-            margin-top: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            font-size: 1.2em;
-            min-height: 80px;
+        }
+
+        .step {
+            display: flex;
+            margin: 12px 0;
+            font-size: 0.95em;
+        }
+
+        .step-number {
+            background: #00b0ff;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.85em;
+            margin-right: 10px;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
-    <div class="snowflakes" id="snowflakes"></div>
-    
+    <!-- Видалено snowflakes -->
+
     <div class="container">
         <header class="header">
-            <h1 class="title">🎄 Різдвяна Магічна Куля ✨</h1>
-            <p class="subtitle">Скануй маркер та відкрий чарівний світ різдвяної магії!</p>
+            <h1 class="title">🎄 Різдвяна Магічна Куля</h1>
+            <p class="subtitle">Скануй маркер — і побач пророцтво!</p>
         </header>
 
-        <div class="content">
-            <div class="ar-section">
-                <div id="ar-scene">
-                    <div class="loading">
-                        <p>🔄 Завантаження магії...</p>
-                        <p>Будь ласка, дай доступ до камери</p>
-                    </div>
-                </div>
-                <div class="current-wish" id="current-wish">
-                    Торкнись магічної кулі, щоб побачити пророцтво!
-                </div>
-                <div class="control-panel">
-                    <button class="btn" onclick="startAR()">▶️ Старт AR</button>
-                    <button class="btn" onclick="stopAR()">⏹️ Стоп AR</button>
-                    <button class="btn" onclick="toggleSound()">🔊 Звук</button>
+        <div class="ar-section">
+            <div id="ar-scene">
+                <div class="loading">
+                    <p>⏳ Завантаження...</p>
+                    <p>Надай доступ до камери</p>
                 </div>
             </div>
+            <div class="control-panel">
+                <button class="btn" onclick="startAR()">▶️ Старт AR</button>
+                <button class="btn" onclick="stopAR()">⏹️ Стоп AR</button>
+                <button class="btn" onclick="toggleSound()">🔊 Звук</button>
+            </div>
+        </div>
 
-            <div class="instructions">
-                <h2>📖 Як грати:</h2>
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <p>Натисни "Старт AR" та дай дозвіл на використання камери</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <p>Наведи камеру на маркер (marker.mind)</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <p>Дивись, як з'являється магічна куля!</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <p>Торкнись кулі — і побачиш різдвяне пророцтво!</p>
-                </div>
+        <div class="instructions">
+            <h2>Як це працює:</h2>
+            <div class="step">
+                <div class="step-number">1</div>
+                <p>Натисни «Старт AR» і дозволь доступ до камери.</p>
+            </div>
+            <div class="step-number">2</div>
+            <p>Наведи камеру на маркер (marker.mind).</p>
+            <div class="step">
+                <div class="step-number">3</div>
+                <p>Торкнись кулі — і побачиш пророцтво!</p>
             </div>
         </div>
     </div>
 
     <script>
-        function createSnowflakes() {
-            const snowflakesContainer = document.getElementById('snowflakes');
-            const snowflakes = ['❄️', '✨', '⭐', '💫', '🔸'];
-            for (let i = 0; i < 50; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.className = 'snowflake';
-                snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
-                snowflake.style.left = Math.random() * 100 + 'vw';
-                snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
-                snowflake.style.animationDelay = Math.random() * 5 + 's';
-                snowflake.style.opacity = Math.random() * 0.7 + 0.3;
-                snowflakesContainer.appendChild(snowflake);
-            }
-        }
-
+        // Аудіо (налаштуй шлях)
         const audio = new Audio('fon.mp3');
         audio.loop = true;
         let isSoundOn = true;
@@ -284,66 +186,57 @@
 
         function showProphecy(parent) {
             // Видаляємо попередній текст
-            if (prophecyText && prophecyText.parentNode) {
+            if (prophecyText) {
                 parent.removeChild(prophecyText);
                 prophecyText = null;
             }
-            if (prophecyShadow && prophecyShadow.parentNode) {
+            if (prophecyShadow) {
                 parent.removeChild(prophecyShadow);
                 prophecyShadow = null;
             }
 
             const message = "Щасливого Різдва!";
 
-            // Тінь для кращої читабельності
+            // Тінь
             prophecyShadow = document.createElement('a-text');
             prophecyShadow.setAttribute('value', message);
-            prophecyShadow.setAttribute('position', '0.02 -0.12 0.82'); // трохи всередині кулі
-            prophecyShadow.setAttribute('color', '#000000');
+            prophecyShadow.setAttribute('position', '0 0 0.9');
+            prophecyShadow.setAttribute('color', '#000');
             prophecyShadow.setAttribute('opacity', '0.6');
-            prophecyShadow.setAttribute('width', '3');
+            prophecyShadow.setAttribute('width', '2.8');
             prophecyShadow.setAttribute('align', 'center');
             prophecyShadow.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
-            prophecyShadow.setAttribute('side', 'double');
 
             // Основний текст
             prophecyText = document.createElement('a-text');
             prophecyText.setAttribute('value', message);
-            prophecyText.setAttribute('position', '0 -0.1 0.8'); // всередині кулі
-            prophecyText.setAttribute('color', '#FFD700'); // золотий
-            prophecyText.setAttribute('width', '3');
+            prophecyText.setAttribute('position', '0 0 0.9');
+            prophecyText.setAttribute('color', '#FFD700');
+            prophecyText.setAttribute('width', '2.8');
             prophecyText.setAttribute('align', 'center');
             prophecyText.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
-            prophecyText.setAttribute('side', 'double');
             prophecyText.setAttribute('opacity', '0');
             prophecyText.setAttribute('animation__fade', 'property: opacity; from: 0; to: 1; dur: 1000; easing: easeOutCubic');
-            prophecyText.setAttribute('animation__scale', 'property: scale; from: 0.8 0.8 0.8; to: 1 1 1; dur: 1000; easing: easeOutBack');
 
             parent.appendChild(prophecyShadow);
             parent.appendChild(prophecyText);
 
-            // Запускаємо анімацію
             setTimeout(() => {
                 if (prophecyText) prophecyText.emit('fadein');
-                if (prophecyShadow) prophecyShadow.emit('fadein');
             }, 100);
 
-            // Автоматично приховуємо через 4 секунди
+            // Зникне через 4 секунди
             setTimeout(() => {
-                if (prophecyText && prophecyText.parentNode) {
+                if (prophecyText) {
                     prophecyText.setAttribute('animation__out', 'property: opacity; to: 0; dur: 800; startEvents: fadeout');
                     prophecyText.emit('fadeout');
+                    setTimeout(() => {
+                        if (prophecyText.parentNode) prophecyText.parentNode.removeChild(prophecyText);
+                        if (prophecyShadow.parentNode) prophecyShadow.parentNode.removeChild(prophecyShadow);
+                        prophecyText = null;
+                        prophecyShadow = null;
+                    }, 800);
                 }
-                if (prophecyShadow && prophecyShadow.parentNode) {
-                    prophecyShadow.setAttribute('animation__out', 'property: opacity; to: 0; dur: 800; startEvents: fadeout');
-                    prophecyShadow.emit('fadeout');
-                }
-                setTimeout(() => {
-                    if (prophecyText && prophecyText.parentNode) parent.removeChild(prophecyText);
-                    if (prophecyShadow && prophecyShadow.parentNode) parent.removeChild(prophecyShadow);
-                    prophecyText = null;
-                    prophecyShadow = null;
-                }, 800);
             }, 4000);
         }
 
@@ -351,9 +244,7 @@
             const scene = document.createElement('a-scene');
             scene.setAttribute('mindar-image', {
                 imageTargetSrc: 'assets/marker.mind',
-                maxTrack: 1,
-                filterMinCF: 0.001,
-                filterBeta: 1000
+                maxTrack: 1
             });
             scene.setAttribute('color-space', 'sRGB');
             scene.setAttribute('embedded', '');
@@ -368,86 +259,36 @@
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
-            // Скляна оболонка
-            const glassShell = document.createElement('a-sphere');
-            glassShell.setAttribute('radius', '1');
-            glassShell.setAttribute('position', '0 0 0');
-            glassShell.setAttribute('material', 'transparent: true; opacity: 0.25; color: #e0f7fa; shader: flat');
-            glassShell.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000');
+            // 🔵 МАГІЧНА КУЛЯ — блакитне скло
+            const magicSphere = document.createElement('a-sphere');
+            magicSphere.setAttribute('radius', '1');
+            magicSphere.setAttribute('position', '0 0 0');
+            magicSphere.setAttribute('material', `
+                color: #00b0ff;
+                transparent: true;
+                opacity: 0.35;
+                shader: flat;
+                side: double
+            `);
+            magicSphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear');
 
-            // Внутрішнє світіння
-            const innerGlow = document.createElement('a-sphere');
-            innerGlow.setAttribute('radius', '0.95');
-            innerGlow.setAttribute('position', '0 0 0');
-            innerGlow.setAttribute('material', 'transparent: true; opacity: 0.4; color: #00b0ff; shader: flat');
-
-            // Декоративний внутрішній куб
-            const innerCube = document.createElement('a-box');
-            innerCube.setAttribute('width', '1.1');
-            innerCube.setAttribute('height', '1.1');
-            innerCube.setAttribute('depth', '1.1');
-            innerCube.setAttribute('position', '0 0 0');
-            innerCube.setAttribute('color', '#ff00ff');
-            innerCube.setAttribute('transparent', 'true');
-            innerCube.setAttribute('opacity', '0.2');
-            innerCube.setAttribute('wireframe', 'true');
-            innerCube.setAttribute('animation', 'property: rotation; to: 360 360 360; loop: true; dur: 15000');
-
-            // Кільця
-            const ring1 = document.createElement('a-cylinder');
-            ring1.setAttribute('radius', '1.6');
-            ring1.setAttribute('height', '0.05');
-            ring1.setAttribute('position', '0 0.4 0');
-            ring1.setAttribute('color', '#ff00ff');
-            ring1.setAttribute('transparent', 'true');
-            ring1.setAttribute('opacity', '0.3');
-            ring1.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 9000');
-
-            const ring2 = document.createElement('a-cylinder');
-            ring2.setAttribute('radius', '1.6');
-            ring2.setAttribute('height', '0.05');
-            ring2.setAttribute('position', '0 -0.4 0');
-            ring2.setAttribute('color', '#00ffff');
-            ring2.setAttribute('transparent', 'true');
-            ring2.setAttribute('opacity', '0.3');
-            ring2.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 9000');
-
-            target.appendChild(glassShell);
-            target.appendChild(innerGlow);
-            target.appendChild(innerCube);
-            target.appendChild(ring1);
-            target.appendChild(ring2);
+            target.appendChild(magicSphere);
             scene.appendChild(target);
 
-            // Початковий підказковий текст
-            const hint = document.createElement('a-text');
-            hint.setAttribute('value', 'Торкнись кулі!');
-            hint.setAttribute('position', '0 -0.3 1');
-            hint.setAttribute('color', '#FFD700');
-            hint.setAttribute('width', '3');
-            hint.setAttribute('align', 'center');
-            hint.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
-            target.appendChild(hint);
+            // Обробник кліку
+            magicSphere.addEventListener('click', function () {
+                if (isSoundOn) {
+                    const clickSound = new Audio('fon.mp3');
+                    clickSound.volume = 0.3;
+                    clickSound.play().catch(e => console.log("Click sound failed:", e));
+                }
+                showProphecy(target);
+            });
 
-            // Клік — показує пророцтво
-            function addClickHandler(element) {
-                element.addEventListener('click', function () {
-                    if (isSoundOn) {
-                        const clickSound = new Audio('fon.mp3');
-                        clickSound.volume = 0.3;
-                        clickSound.play().catch(e => console.log("Click sound failed:", e));
-                    }
-                    showProphecy(target);
-                });
-            }
-
-            [glassShell, innerGlow, innerCube, ring1, ring2, hint].forEach(addClickHandler);
-
+            // Підключаємо сцену
             const arContainer = document.getElementById('ar-scene');
             arContainer.innerHTML = '';
             arContainer.appendChild(scene);
-
-            document.getElementById('current-wish').style.display = 'none';
 
             if (isSoundOn) {
                 audio.play().catch(e => console.log("Background audio failed:", e));
@@ -458,18 +299,16 @@
             const arContainer = document.getElementById('ar-scene');
             arContainer.innerHTML = `
                 <div class="loading">
-                    <p>🔄 AR зупинено</p>
-                    <p>Натисни "Старт AR" щоб продовжити</p>
+                    <p>⏹️ AR зупинено</p>
+                    <p>Натисни «Старт AR»</p>
                 </div>
             `;
-            const wishDisplay = document.getElementById('current-wish');
-            wishDisplay.style.display = 'flex';
-            wishDisplay.textContent = 'Торкнись магічної кулі, щоб побачити пророцтво!';
             audio.pause();
         }
 
+        // Ініціалізація — сніжинок НЕМАЄ
         document.addEventListener('DOMContentLoaded', function () {
-            createSnowflakes();
+            // createSnowflakes() — НЕ ВИКЛИКАЄМО
         });
     </script>
 </body>
