@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Christmas Ball</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.0.0/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
     <style>
         * {
             margin: 0;
@@ -50,16 +51,17 @@
         }
 
         .start-button {
-            padding: 15px 30px;
-            font-size: 1.2em;
+            padding: 20px 40px;
+            font-size: 1.5em;
             background: linear-gradient(45deg, #FF69B4, #9370DB);
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 30px 0;
             transition: transform 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.4);
         }
 
         .start-button:hover {
@@ -86,6 +88,30 @@
             border-radius: 15px;
             overflow: hidden;
             background: rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .video-overlay {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .magic-ball {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #FF69B4, #9370DB);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 50px rgba(255, 105, 180, 0.8);
+            animation: float 3s ease-in-out infinite;
+            display: none;
+            z-index: 10;
         }
 
         .instructions {
@@ -107,8 +133,9 @@
             align-items: center;
             justify-content: center;
             border: 2px solid #FFFFFF;
-            font-size: 1.1em;
+            font-size: 1.2em;
             line-height: 1.4;
+            font-weight: bold;
         }
 
         .control-panel {
@@ -147,9 +174,34 @@
             font-size: 1.1em;
         }
 
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            color: white;
+            z-index: 5;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+            50% { transform: translate(-50%, -50%) translateY(-20px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
         @media (max-width: 480px) {
             .title {
                 font-size: 1.5em;
+            }
+            
+            .start-button {
+                padding: 15px 30px;
+                font-size: 1.3em;
             }
             
             .btn {
@@ -190,7 +242,8 @@
         <!-- AR контейнер (спочатку прихований) -->
         <div class="ar-container" id="ar-container">
             <div id="ar-scene">
-                <!-- AR сцена з'явиться тут -->
+                <div class="loading" id="loading">Starting camera... 📱</div>
+                <div class="magic-ball" id="magic-ball" onclick="showProphecy()"></div>
             </div>
         </div>
 
@@ -200,6 +253,7 @@
 
         <div class="control-panel">
             <button class="btn" onclick="restartCamera()">🔄 Restart Camera</button>
+            <button class="btn" onclick="showProphecy()">✨ Get Prophecy</button>
         </div>
     </div>
 
@@ -218,100 +272,99 @@
             "This will be your most magical Christmas! 🔮🎉"
         ];
 
-        let currentScene = null;
+        let cameraStream = null;
 
-        // Запуск камери (обов'язково по кліку)
-        function startCamera() {
-            // Ховаємо стартовий екран
-            document.getElementById('start-screen').style.display = 'none';
+        // Запуск камери
+        async function startCamera() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                
+                // Запит доступу до камери
+                cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment', // Задня камера
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false 
+                });
+
+                // Ховаємо стартовий екран
+                document.getElementById('start-screen').style.display = 'none';
+                
+                // Показуємо AR контейнер
+                document.getElementById('ar-container').style.display = 'block';
+
+                // Створюємо відео елемент
+                const video = document.createElement('video');
+                video.srcObject = cameraStream;
+                video.playsInline = true;
+                video.setAttribute('playsinline', '');
+                video.className = 'video-overlay';
+                
+                const arScene = document.getElementById('ar-scene');
+                arScene.appendChild(video);
+
+                // Запускаємо відео
+                video.play().then(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('magic-ball').style.display = 'block';
+                    
+                    // Симулюємо знаходження маркера через 2 секунди
+                    setTimeout(() => {
+                        simulateMarkerFound();
+                    }, 2000);
+                });
+
+            } catch (error) {
+                console.error('Camera error:', error);
+                document.getElementById('loading').textContent = 'Camera access denied 😢\nPlease allow camera access and try again.';
+                alert('Please allow camera access to see the magic!');
+            }
+        }
+
+        // Симуляція знаходження маркера
+        function simulateMarkerFound() {
+            const magicBall = document.getElementById('magic-ball');
+            magicBall.style.animation = 'pulse 1s ease-in-out infinite';
+            document.getElementById('prophecy-display').textContent = 'Magic ball found! 🎉 Tap it for prophecies!';
+        }
+
+        // Показати пророцтво
+        function showProphecy() {
+            const randomProphecy = prophecies[Math.floor(Math.random() * prophecies.length)];
+            document.getElementById('prophecy-display').textContent = randomProphecy;
             
-            // Показуємо AR контейнер
-            document.getElementById('ar-container').style.display = 'block';
+            // Анімація кулі
+            const magicBall = document.getElementById('magic-ball');
+            magicBall.style.animation = 'none';
+            setTimeout(() => {
+                magicBall.style.animation = 'pulse 1s ease-in-out infinite';
+            }, 100);
             
-            // Ініціалізуємо AR
-            initializeAR();
+            // Зміна кольору
+            const colors = ['#FF69B4', '#9370DB', '#BA55D3', '#FF1493', '#8A2BE2'];
+            magicBall.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * colors.length)]}, #9370DB)`;
         }
 
         // Перезапуск камери
         function restartCamera() {
-            if (currentScene) {
-                document.getElementById('ar-scene').removeChild(currentScene);
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
             }
-            initializeAR();
-        }
-
-        // Ініціалізація AR
-        function initializeAR() {
-            const scene = document.createElement('a-scene');
-            currentScene = scene;
             
-            // MindAR конфігурація
-            scene.setAttribute('mindar-image', {
-                imageTargetSrc: 'assets/marker.mind',
-                maxTrack: 1,
-                autoStart: true
-            });
-            scene.setAttribute('embedded', '');
-            scene.setAttribute('renderer', 'colorManagement: true');
-            scene.setAttribute('loading-screen', 'enabled: false');
-
-            // Камера - ОБОВ'ЯЗКОВО задня для мобільних
-            const camera = document.createElement('a-camera');
-            camera.setAttribute('position', '0 0 0');
-            camera.setAttribute('look-controls', 'enabled: true');
-            scene.appendChild(camera);
-
-            // Ціль для трекінгу
-            const target = document.createElement('a-entity');
-            target.setAttribute('mindar-image-target', 'targetIndex: 0');
-
-            // Магічна куля
-            const sphere = document.createElement('a-sphere');
-            sphere.setAttribute('radius', '0.3');
-            sphere.setAttribute('color', '#FF69B4');
-            sphere.setAttribute('transparent', 'true');
-            sphere.setAttribute('opacity', '0.8');
-            sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 8000');
-
-            // Внутрішня частина
-            const innerSphere = document.createElement('a-sphere');
-            innerSphere.setAttribute('radius', '0.2');
-            innerSphere.setAttribute('color', '#9370DB');
-            innerSphere.setAttribute('transparent', 'true');
-            innerSphere.setAttribute('opacity', '0.6');
-
-            // Обробник кліку
-            function handleClick() {
-                const randomProphecy = prophecies[
-                    Math.floor(Math.random() * prophecies.length)
-                ];
-                document.getElementById('prophecy-display').textContent = randomProphecy;
-                
-                // Анімація
-                sphere.setAttribute('animation', 'property: scale; to: 1.3 1.3 1.3; dur: 300; dir: alternate');
-                
-                // Зміна кольору
-                const colors = ['#FF69B4', '#9370DB', '#BA55D3', '#FF1493'];
-                sphere.setAttribute('color', colors[Math.floor(Math.random() * colors.length)]);
-            }
-
-            sphere.addEventListener('click', handleClick);
-            innerSphere.addEventListener('click', handleClick);
-
-            target.appendChild(sphere);
-            target.appendChild(innerSphere);
-            scene.appendChild(target);
-
-            // Додаємо сцену
-            const arContainer = document.getElementById('ar-scene');
-            arContainer.appendChild(scene);
-
-            console.log('AR camera started! Point at marker to see magic!');
+            const arScene = document.getElementById('ar-scene');
+            arScene.innerHTML = '<div class="loading" id="loading">Restarting camera... 📱</div><div class="magic-ball" id="magic-ball" onclick="showProphecy()"></div>';
+            
+            document.getElementById('magic-ball').style.display = 'none';
+            startCamera();
         }
 
-        // Обробка помилок
-        window.addEventListener('error', function(e) {
-            console.log('Error:', e.error);
+        // Автоматично запустити камеру при кліку на сторінці (для тесту)
+        document.addEventListener('click', function() {
+            if (document.getElementById('start-screen').style.display !== 'none') {
+                startCamera();
+            }
         });
     </script>
 </body>
