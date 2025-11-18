@@ -10,16 +10,38 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { 
             width: 100%; height: 100%; overflow: hidden; 
-            background: #000; /* чорний, бо відео перекриє */
+            background: #000;
+            font-family: Arial, sans-serif;
         }
         a-scene { 
             position: fixed; top: 0; left: 0; 
             width: 100% !important; height: 100% !important; 
             background: transparent; 
         }
+
+        /* Кнопка звуку — зовні сцени, але не перекривається */
+        #sound-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 24px;
+            background: linear-gradient(45deg, #00b0ff, #ff00ff);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            pointer-events: auto; /* важливо! */
+        }
     </style>
 </head>
 <body>
+    <!-- 🔊 Кнопка звуку — ЗОВНІ сцени, але з високим z-index -->
+    <button id="sound-btn">🔊 Увімкнути звук</button>
+
     <a-scene
         mindar-image="imageTargetSrc: assets/marker.mind; maxTrack: 1"
         embedded
@@ -27,16 +49,14 @@
         vr-mode-ui="enabled: false"
         device-orientation-permission-ui="enabled: false"
         loading-screen="enabled: false"
+        cursor="rayOrigin: mouse"
     >
-        <!-- Аудіо -->
         <a-assets>
             <audio id="bg-music" src="fon.mp3" preload="auto" loop></audio>
         </a-assets>
 
-        <!-- Камера -->
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-        <!-- Маркер -->
         <a-entity mindar-image-target="targetIndex: 0">
             <a-sphere
                 id="magic-sphere"
@@ -64,84 +84,51 @@
             </a-sphere>
         </a-entity>
 
-        <!-- 💡 ЛОАДЕР (всередині сцени!) -->
+        <!-- Лоадер (всередині сцени) -->
         <a-entity id="loader" position="0 0 -2" visible="true">
-            <a-plane 
-                width="3" height="2" 
-                color="#0a0f2c" 
-                opacity="0.85" 
-                side="double"
-                position="0 0 0"
-            ></a-plane>
-            <a-text 
-                value="🎄 Різдвяна Магічна Куля" 
-                position="0 0.4 0.01" 
-                align="center" 
-                color="#00b0ff" 
-                width="2.8"
-                font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-            ></a-text>
-            <a-text 
-                value="Наведи камеру на маркер!" 
-                position="0 -0.2 0.01" 
-                align="center" 
-                color="#ffffff" 
-                width="2.8"
-                font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-            ></a-text>
-        </a-entity>
-
-        <!-- 🔊 КНОПКА ЗВУКУ (всередині сцени!) -->
-        <a-entity id="sound-ui" position="0 -1.2 -2">
-            <a-plane 
-                id="sound-btn-bg" 
-                width="1.6" height="0.4" 
-                color="#00b0ff" 
-                opacity="0.9" 
-                side="double"
-                position="0 0 0"
-                cursor="rayOrigin: mouse"
-                animation__hover="property: scale; to: 1.1 1.1 1.1; startEvents: mouseenter; dur: 200"
-                animation__leave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
-            ></a-plane>
-            <a-text 
-                id="sound-btn-text"
-                value="🔊 Увімкнути звук" 
-                position="0 0 0.01" 
-                align="center" 
-                color="#ffffff" 
-                width="1.5"
-                font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
-            ></a-text>
+            <a-plane width="3" height="1.2" color="#0a0f2c" opacity="0.8" side="double"></a-plane>
+            <a-text value="Наведи камеру на маркер!" align="center" color="#00b0ff" width="2.5" position="0 0 0.01"></a-text>
         </a-entity>
     </a-scene>
 
     <script>
-        let isTargetActive = false;
         const bgMusic = document.getElementById('bg-music');
         const loader = document.getElementById('loader');
         const sphere = document.getElementById('magic-sphere');
-        const soundBtnBg = document.getElementById('sound-btn-bg');
-        const soundBtnText = document.getElementById('sound-btn-text');
+        const soundBtn = document.getElementById('sound-btn');
+        let isTargetActive = false;
 
-        // Пророцтво
+        // 🔊 Кнопка звуку — незалежна від AR
+        soundBtn.addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play().catch(e => console.log("🔇 Audio failed:", e));
+                soundBtn.textContent = '🔊 Вимкнути звук';
+            } else {
+                bgMusic.pause();
+                soundBtn.textContent = '🔊 Увімкнути звук';
+            }
+        });
+
+        // Показ пророцтва НА ЕКВАТОРІ
         function showProphecy() {
             const parent = sphere.parentNode;
             const message = "Щасливого Різдва!";
 
-            // Видаляємо старий
+            // Видаляємо старий текст
             [...parent.querySelectorAll('[data-prophecy]')].forEach(el => el.remove());
 
+            // Текст на екваторі: Y=0, Z=0.85 (трохи попереду кулі)
             const text = document.createElement('a-text');
             text.setAttribute('value', message);
-            text.setAttribute('position', '0 0 0.75');
+            text.setAttribute('position', '0 0 0.85'); // ← ось тут — екватор!
             text.setAttribute('color', '#FFD700');
-            text.setAttribute('width', '2.6');
+            text.setAttribute('width', '2.4');
             text.setAttribute('align', 'center');
             text.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
             text.setAttribute('opacity', '0');
             text.setAttribute('animation__fade', 'property: opacity; from: 0; to: 1; dur: 1000; easing: easeOutCubic');
             text.setAttribute('data-prophecy', 'true');
+            text.setAttribute('side', 'double');
 
             parent.appendChild(text);
             setTimeout(() => text.emit('fadein'), 100);
@@ -162,45 +149,32 @@
                 isTargetActive = true;
                 loader.setAttribute('visible', 'false');
                 sphere.setAttribute('visible', 'true');
-                if (bgMusic.paused) {
-                    bgMusic.play().catch(e => console.log("🔇 Audio failed:", e));
-                    soundBtnText.setAttribute('value', '🔊 Вимкнути звук');
-                }
             });
+
             target.addEventListener('targetLost', () => {
                 isTargetActive = false;
                 loader.setAttribute('visible', 'true');
                 sphere.setAttribute('visible', 'false');
-                if (!bgMusic.paused) bgMusic.pause();
-                soundBtnText.setAttribute('value', '🔊 Увімкнути звук');
+                // При втраті маркера — приховуємо пророцтво
+                [...sphere.parentNode.querySelectorAll('[data-prophecy]')].forEach(el => el.remove());
             });
         }
 
-        // Клік по кулі → пророцтво
-        sphere.addEventListener('click', () => {
+        // ✅ Клік по кулі → пророцтво
+        sphere.addEventListener('click', (evt) => {
             if (isTargetActive) {
+                evt.preventDefault();
                 showProphecy();
+                console.log("✨ Пророцтво активовано!");
             }
         });
 
-        // Клік по кнопці звуку
-        soundBtnBg.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                bgMusic.play().catch(e => console.log("🔇 Audio failed:", e));
-                soundBtnText.setAttribute('value', '🔊 Вимкнути звук');
-            } else {
-                bgMusic.pause();
-                soundBtnText.setAttribute('value', '🔊 Увімкнути звук');
-            }
-        });
-
-        // 📱 Мобільний fallback: будь-яке торкання → пророцтво (якщо маркер активний)
+        // 📱 Мобільний fallback: торкання екрану (окрім кнопки) → пророцтво
         document.body.addEventListener('touchstart', (e) => {
             if (isTargetActive) {
-                e.preventDefault();
-                // Не блокуємо, якщо торкнулися кнопки
-                const target = e.target;
-                if (target.id !== 'sound-btn-bg' && !target.closest('#sound-btn-bg')) {
+                // Якщо торкнулися не кнопки — активувати пророцтво
+                if (!e.target.closest('#sound-btn')) {
+                    e.preventDefault();
                     showProphecy();
                 }
             }
