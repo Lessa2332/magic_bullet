@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magic Christmas Ball</title>
-    <!-- Стабільні версії що працювали -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.0.0/dist/mindar-image-aframe.prod.js"></script>
     <style>
@@ -20,12 +19,13 @@
             color: white;
             overflow-x: hidden;
             min-height: 100vh;
+            text-align: center;
         }
 
         .container {
             max-width: 100%;
             margin: 0 auto;
-            padding: 15px;
+            padding: 20px;
         }
 
         .header {
@@ -35,44 +35,39 @@
             border-radius: 20px;
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
-            position: relative;
-        }
-
-        .language-switcher {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            display: flex;
-            gap: 8px;
-        }
-
-        .lang-btn {
-            padding: 6px 12px;
-            border: 2px solid white;
-            border-radius: 15px;
-            background: transparent;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .lang-btn.active {
-            background: white;
-            color: #8A2BE2;
         }
 
         .title {
             font-size: 2em;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             text-shadow: 0 0 15px #FF69B4, 0 0 25px #9370DB;
-            padding: 0 60px 0 0;
         }
 
         .subtitle {
-            font-size: 1em;
+            font-size: 1.1em;
             color: #E6E6FA;
+            margin-bottom: 10px;
+        }
+
+        .start-button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background: linear-gradient(45deg, #FF69B4, #9370DB);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: transform 0.3s ease;
+        }
+
+        .start-button:hover {
+            transform: scale(1.05);
+        }
+
+        .start-button:active {
+            transform: scale(0.95);
         }
 
         .ar-container {
@@ -81,6 +76,7 @@
             padding: 15px;
             margin-bottom: 20px;
             border: 3px solid #9370DB;
+            display: none;
         }
 
         #ar-scene {
@@ -93,7 +89,6 @@
         }
 
         .instructions {
-            text-align: center;
             padding: 15px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
@@ -144,25 +139,17 @@
             display: none !important;
         }
 
-        .magic-sparkle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: gold;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: sparkle-float 3s ease-in-out infinite;
-        }
-
-        @keyframes sparkle-float {
-            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
-            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        .camera-permission {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.1em;
         }
 
         @media (max-width: 480px) {
             .title {
                 font-size: 1.5em;
-                padding: 0 50px 0 0;
             }
             
             .btn {
@@ -175,103 +162,90 @@
 <body>
     <div class="container">
         <header class="header">
-            <div class="language-switcher">
-                <button class="lang-btn active" onclick="switchLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="switchLanguage('uk')">UK</button>
-            </div>
-            
-            <div id="en-content">
-                <h1 class="title">🎄 Magic Christmas Ball 🔮</h1>
-                <p class="subtitle">Point camera at marker - magic appears!</p>
-            </div>
-            
-            <div id="uk-content" class="hidden">
-                <h1 class="title">🎄 Магічна Різдвяна Куля 🔮</h1>
-                <p class="subtitle">Наведи камеру на маркер - з'явиться магія!</p>
-            </div>
+            <h1 class="title">🎄 Magic Christmas Ball 🔮</h1>
+            <p class="subtitle">Find the magic ball with your camera!</p>
         </header>
 
-        <div class="ar-container">
-            <div id="ar-scene">
-                <!-- AR scene will appear here -->
+        <!-- Початковий екран з кнопкою запуску -->
+        <div id="start-screen">
+            <div class="camera-permission">
+                <h3>📱 Camera Access Required</h3>
+                <p>To see the magic Christmas ball, we need to use your <strong>back camera</strong></p>
+                <p>Click the button below to start the magic!</p>
+            </div>
+            
+            <button class="start-button" onclick="startCamera()">
+                🎮 Start Magic Camera!
+            </button>
+
+            <div class="instructions">
+                <p><strong>How to play:</strong></p>
+                <p>1. Click "Start Magic Camera"</p>
+                <p>2. Allow camera access when asked</p>
+                <p>3. Point at the Christmas marker</p>
+                <p>4. Tap the magic ball for prophecies! ✨</p>
             </div>
         </div>
 
-        <div class="instructions">
-            <div id="en-instructions">
-                <p>🔮 <strong>Point camera at Christmas marker</strong> - the magic ball appears automatically!</p>
-            </div>
-            <div id="uk-instructions" class="hidden">
-                <p>🔮 <strong>Наведи камеру на різдвяний маркер</strong> - магічна куля з'явиться автоматично!</p>
+        <!-- AR контейнер (спочатку прихований) -->
+        <div class="ar-container" id="ar-container">
+            <div id="ar-scene">
+                <!-- AR сцена з'явиться тут -->
             </div>
         </div>
 
         <div class="prophecy-display" id="prophecy-display">
-            <div id="en-prophecy">Point camera at marker to begin magic! ✨</div>
-            <div id="uk-prophecy" class="hidden">Наведи камеру на маркер щоб почати магію! ✨</div>
+            Start camera and point at marker to begin magic! ✨
         </div>
 
         <div class="control-panel">
-            <button class="btn" onclick="createSparkles()">✨ More Magic!</button>
+            <button class="btn" onclick="restartCamera()">🔄 Restart Camera</button>
         </div>
     </div>
 
     <script>
-        // Language management
-        let currentLanguage = 'en';
-        
-        function switchLanguage(lang) {
-            currentLanguage = lang;
-            
-            // Update buttons
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Toggle content
-            document.getElementById('en-content').classList.toggle('hidden', lang !== 'en');
-            document.getElementById('uk-content').classList.toggle('hidden', lang !== 'uk');
-            document.getElementById('en-instructions').classList.toggle('hidden', lang !== 'en');
-            document.getElementById('uk-instructions').classList.toggle('hidden', lang !== 'uk');
-            document.getElementById('en-prophecy').classList.toggle('hidden', lang !== 'en');
-            document.getElementById('uk-prophecy').classList.toggle('hidden', lang !== 'uk');
-        }
-
         // Christmas prophecies
-        const prophecies = {
-            en: [
-                "This Christmas, you'll receive the most magical gift! 🎁✨",
-                "Santa has a special surprise just for you! 🌟🎅", 
-                "Your Christmas wish will come true! 💫",
-                "Magic snowflakes will bring you joy! ❄️😊",
-                "You'll be the star of Christmas! ⭐🎄"
-            ],
-            uk: [
-                "Цього Різдва ти отримаєш найчарівніший подарунок! 🎁✨",
-                "Дід Мороз приготував для тебе сюрприз! 🌟🎅",
-                "Твоє різдвяне бажання здійсниться! 💫",
-                "Чарівні сніжинки принесуть радість! ❄️😊",
-                "Ти будеш зіркою Різдва! ⭐🎄"
-            ]
-        };
+        const prophecies = [
+            "This Christmas, you'll receive the most magical gift! 🎁✨",
+            "Santa has a special surprise just for you! 🌟🎅", 
+            "Your Christmas wish will come true! 💫",
+            "Magic snowflakes will bring you joy! ❄️😊",
+            "You'll be the star of Christmas! ⭐🎄",
+            "Christmas elves are making magic for you! 🧝‍♂️✨",
+            "Your kindness will create Christmas magic! 🌈💖",
+            "Look for the shooting star tonight! 🌠",
+            "The reindeer chose you for adventure! 🦄🎄",
+            "This will be your most magical Christmas! 🔮🎉"
+        ];
 
-        function createSparkles() {
-            const container = document.querySelector('.container');
-            for (let i = 0; i < 10; i++) {
-                const sparkle = document.createElement('div');
-                sparkle.className = 'magic-sparkle';
-                sparkle.style.left = Math.random() * 100 + 'vw';
-                sparkle.style.top = Math.random() * 100 + 'vh';
-                sparkle.style.animationDelay = Math.random() * 2 + 's';
-                container.appendChild(sparkle);
-                setTimeout(() => sparkle.remove(), 3000);
-            }
+        let currentScene = null;
+
+        // Запуск камери (обов'язково по кліку)
+        function startCamera() {
+            // Ховаємо стартовий екран
+            document.getElementById('start-screen').style.display = 'none';
+            
+            // Показуємо AR контейнер
+            document.getElementById('ar-container').style.display = 'block';
+            
+            // Ініціалізуємо AR
+            initializeAR();
         }
 
-        // Initialize AR - проста стабільна версія
+        // Перезапуск камери
+        function restartCamera() {
+            if (currentScene) {
+                document.getElementById('ar-scene').removeChild(currentScene);
+            }
+            initializeAR();
+        }
+
+        // Ініціалізація AR
         function initializeAR() {
             const scene = document.createElement('a-scene');
+            currentScene = scene;
             
-            // Базова конфігурація MindAR
+            // MindAR конфігурація
             scene.setAttribute('mindar-image', {
                 imageTargetSrc: 'assets/marker.mind',
                 maxTrack: 1,
@@ -279,14 +253,15 @@
             });
             scene.setAttribute('embedded', '');
             scene.setAttribute('renderer', 'colorManagement: true');
+            scene.setAttribute('loading-screen', 'enabled: false');
 
-            // Камера
+            // Камера - ОБОВ'ЯЗКОВО задня для мобільних
             const camera = document.createElement('a-camera');
             camera.setAttribute('position', '0 0 0');
             camera.setAttribute('look-controls', 'enabled: true');
             scene.appendChild(camera);
 
-            // Ціль
+            // Ціль для трекінгу
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
@@ -307,17 +282,16 @@
 
             // Обробник кліку
             function handleClick() {
-                const randomProphecy = prophecies[currentLanguage][
-                    Math.floor(Math.random() * prophecies[currentLanguage].length)
+                const randomProphecy = prophecies[
+                    Math.floor(Math.random() * prophecies.length)
                 ];
                 document.getElementById('prophecy-display').textContent = randomProphecy;
-                createSparkles();
                 
                 // Анімація
-                sphere.setAttribute('animation', 'property: scale; to: 1.2 1.2 1.2; dur: 300; dir: alternate');
+                sphere.setAttribute('animation', 'property: scale; to: 1.3 1.3 1.3; dur: 300; dir: alternate');
                 
                 // Зміна кольору
-                const colors = ['#FF69B4', '#9370DB', '#BA55D3'];
+                const colors = ['#FF69B4', '#9370DB', '#BA55D3', '#FF1493'];
                 sphere.setAttribute('color', colors[Math.floor(Math.random() * colors.length)]);
             }
 
@@ -332,18 +306,12 @@
             const arContainer = document.getElementById('ar-scene');
             arContainer.appendChild(scene);
 
-            console.log('AR initialized successfully!');
+            console.log('AR camera started! Point at marker to see magic!');
         }
-
-        // Запускаємо при завантаженні
-        document.addEventListener('DOMContentLoaded', function() {
-            createSparkles();
-            setTimeout(initializeAR, 1000);
-        });
 
         // Обробка помилок
         window.addEventListener('error', function(e) {
-            console.log('Error occurred:', e.error);
+            console.log('Error:', e.error);
         });
     </script>
 </body>
