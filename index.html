@@ -1,371 +1,343 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magic Christmas Ball</title>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
+    <title>Чарівна Магічна Куля</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
-            background: linear-gradient(135deg, #8A2BE2, #FF1493, #4B0082);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: white;
-            overflow-x: hidden;
             min-height: 100vh;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 20px;
         }
-
+        
         .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
             text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
+            max-width: 800px;
+            width: 100%;
         }
-
-        .title {
-            font-size: 2em;
+        
+        h1 {
+            font-size: 2.5rem;
             margin-bottom: 10px;
-            text-shadow: 0 0 15px #FF69B4, 0 0 25px #9370DB;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
+        
         .subtitle {
-            font-size: 1.1em;
-            color: #E6E6FA;
-            margin-bottom: 10px;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
         }
-
-        .start-button {
-            padding: 20px 40px;
-            font-size: 1.5em;
-            background: linear-gradient(45deg, #FF69B4, #9370DB);
+        
+        .magic-ball-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 40px;
+            perspective: 1000px;
+        }
+        
+        .magic-ball {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 1.5s ease-in-out;
+            cursor: pointer;
+        }
+        
+        .magic-ball:hover {
+            transform: rotateY(15deg) rotateX(10deg);
+        }
+        
+        .ball {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #1a1a2e, #16213e, #0f3460);
+            box-shadow: 
+                inset 0 0 50px rgba(255, 255, 255, 0.1),
+                inset 0 0 100px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(100, 149, 237, 0.5),
+                0 0 60px rgba(100, 149, 237, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .ball::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        .ball-inner {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.05), transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .prophecy {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #feb47b;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 3;
+            padding: 20px;
+            text-shadow: 0 0 10px rgba(254, 180, 123, 0.7);
+        }
+        
+        .prophecy.active {
+            opacity: 1;
+        }
+        
+        .shine {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 50%);
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: float 5s infinite ease-in-out;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
             color: white;
             border: none;
             border-radius: 30px;
             cursor: pointer;
-            font-weight: bold;
-            margin: 30px 0;
-            transition: transform 0.3s ease;
-            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.4);
-        }
-
-        .start-button:hover {
-            transform: scale(1.05);
-        }
-
-        .start-button:active {
-            transform: scale(0.95);
-        }
-
-        .ar-container {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 3px solid #9370DB;
-            display: none;
-        }
-
-        #ar-scene {
-            width: 100%;
-            height: 60vh;
-            min-height: 400px;
-            border-radius: 15px;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-
-        .video-overlay {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 15px;
-        }
-
-        .magic-ball {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, #FF69B4, #9370DB);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 50px rgba(255, 105, 180, 0.8);
-            animation: float 3s ease-in-out infinite;
-            display: none;
-            z-index: 10;
-        }
-
-        .instructions {
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        .prophecy-display {
-            background: linear-gradient(135deg, #FF69B4, #9370DB);
-            padding: 20px;
-            border-radius: 20px;
-            margin: 15px 0;
-            text-align: center;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #FFFFFF;
-            font-size: 1.2em;
-            line-height: 1.4;
-            font-weight: bold;
-        }
-
-        .control-panel {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            background: linear-gradient(45deg, #FF69B4, #9370DB);
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
             transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-
-        .btn:active {
-            transform: scale(0.95);
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
-
-        .hidden {
-            display: none !important;
+        
+        button:active {
+            transform: translateY(1px);
         }
-
-        .camera-permission {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            font-size: 1.1em;
+        
+        .instructions {
+            margin-top: 30px;
+            font-size: 1rem;
+            opacity: 0.8;
+            max-width: 500px;
+            line-height: 1.5;
         }
-
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5em;
-            color: white;
-            z-index: 5;
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
+        
         @keyframes float {
-            0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
-            50% { transform: translate(-50%, -50%) translateY(-20px); }
+            0%, 100% { transform: translate(0, 0); opacity: 0; }
+            50% { opacity: 1; }
         }
-
-        @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(100, 149, 237, 0.5), 0 0 60px rgba(100, 149, 237, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(100, 149, 237, 0.7), 0 0 80px rgba(100, 149, 237, 0.5); }
         }
-
-        @media (max-width: 480px) {
-            .title {
-                font-size: 1.5em;
+        
+        .magic-ball.active {
+            animation: glow 2s infinite;
+        }
+        
+        @media (max-width: 600px) {
+            .magic-ball-container {
+                width: 250px;
+                height: 250px;
             }
             
-            .start-button {
-                padding: 15px 30px;
-                font-size: 1.3em;
+            h1 {
+                font-size: 2rem;
             }
             
-            .btn {
-                padding: 10px 16px;
-                font-size: 14px;
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 200px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1 class="title">🎄 Magic Christmas Ball 🔮</h1>
-            <p class="subtitle">Find the magic ball with your camera!</p>
-        </header>
-
-        <!-- Початковий екран з кнопкою запуску -->
-        <div id="start-screen">
-            <div class="camera-permission">
-                <h3>📱 Camera Access Required</h3>
-                <p>To see the magic Christmas ball, we need to use your <strong>back camera</strong></p>
-                <p>Click the button below to start the magic!</p>
-            </div>
-            
-            <button class="start-button" onclick="startCamera()">
-                🎮 Start Magic Camera!
-            </button>
-
-            <div class="instructions">
-                <p><strong>How to play:</strong></p>
-                <p>1. Click "Start Magic Camera"</p>
-                <p>2. Allow camera access when asked</p>
-                <p>3. Point at the Christmas marker</p>
-                <p>4. Tap the magic ball for prophecies! ✨</p>
+        <h1>Чарівна Магічна Куля</h1>
+        <p class="subtitle">Натисніть на кулю, щоб отримати пророцтво</p>
+        
+        <div class="magic-ball-container">
+            <div class="magic-ball" id="magicBall">
+                <div class="ball">
+                    <div class="particles" id="particles"></div>
+                    <div class="shine"></div>
+                    <div class="ball-inner">
+                        <div class="prophecy" id="prophecy"></div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- AR контейнер (спочатку прихований) -->
-        <div class="ar-container" id="ar-container">
-            <div id="ar-scene">
-                <div class="loading" id="loading">Starting camera... 📱</div>
-                <div class="magic-ball" id="magic-ball" onclick="showProphecy()"></div>
-            </div>
+        
+        <div class="controls">
+            <button id="getProphecy">Отримати пророцтво</button>
+            <button id="resetBall">Очистити кулю</button>
         </div>
-
-        <div class="prophecy-display" id="prophecy-display">
-            Start camera and point at marker to begin magic! ✨
-        </div>
-
-        <div class="control-panel">
-            <button class="btn" onclick="restartCamera()">🔄 Restart Camera</button>
-            <button class="btn" onclick="showProphecy()">✨ Get Prophecy</button>
+        
+        <div class="instructions">
+            <p>Чарівна куля містить відповіді на ваші найглибші питання. Сконцентруйтеся на питанні та натисніть на кулю, щоб отримати пророцтво.</p>
         </div>
     </div>
 
     <script>
-        // Christmas prophecies
-        const prophecies = [
-            "This Christmas, you'll receive the most magical gift! 🎁✨",
-            "Santa has a special surprise just for you! 🌟🎅", 
-            "Your Christmas wish will come true! 💫",
-            "Magic snowflakes will bring you joy! ❄️😊",
-            "You'll be the star of Christmas! ⭐🎄",
-            "Christmas elves are making magic for you! 🧝‍♂️✨",
-            "Your kindness will create Christmas magic! 🌈💖",
-            "Look for the shooting star tonight! 🌠",
-            "The reindeer chose you for adventure! 🦄🎄",
-            "This will be your most magical Christmas! 🔮🎉"
-        ];
-
-        let cameraStream = null;
-
-        // Запуск камери
-        async function startCamera() {
-            try {
-                document.getElementById('loading').style.display = 'block';
+        document.addEventListener('DOMContentLoaded', function() {
+            const magicBall = document.getElementById('magicBall');
+            const prophecyElement = document.getElementById('prophecy');
+            const getProphecyButton = document.getElementById('getProphecy');
+            const resetBallButton = document.getElementById('resetBall');
+            const particlesContainer = document.getElementById('particles');
+            
+            // Список пророцтв
+            const prophecies = [
+                "Твоє майбутнє сяє яскраво, як зірка на нічному небі.",
+                "Несподівана зустріч змінить твій шлях назавжди.",
+                "Вір у себе, і ти зможеш досягти будь-чого.",
+                "Найкращі моменти твого життя ще попереду.",
+                "Ти знайдеш відповіді, які шукав так довго.",
+                "Нове захоплення наповнить твоє життя радістю.",
+                "Подорож відкриє перед тобою нові горизонти.",
+                "Твоя наполегливість буде винагороджена найкращим чином.",
+                "Зустріч з давнім другом принесе радісні звістки.",
+                "Твої творчі здібності розкриються у повній мірі.",
+                "Фінансове благополуччя чекає на тебе в найближчому майбутньому.",
+                "Ти знайдеш внутрішній спокій серед хаосу.",
+                "Нова можливість з'явиться, коли ти цього найменш очікуєш.",
+                "Твоя доброта повернеться до тебе подвійною мірою.",
+                "Відкриття, яке ти зробиш, змінить твоє сприйняття світу."
+            ];
+            
+            // Створення частинок
+            function createParticles() {
+                particlesContainer.innerHTML = '';
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            
+            // Отримання випадкового пророцтва
+            function getRandomProphecy() {
+                const randomIndex = Math.floor(Math.random() * prophecies.length);
+                return prophecies[randomIndex];
+            }
+            
+            // Показати пророцтво
+            function showProphecy() {
+                // Анімація кулі
+                magicBall.classList.add('active');
                 
-                // Запит доступу до камери
-                cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment', // Задня камера
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: false 
-                });
-
-                // Ховаємо стартовий екран
-                document.getElementById('start-screen').style.display = 'none';
+                // Очистити попереднє пророцтво
+                prophecyElement.textContent = '';
+                prophecyElement.classList.remove('active');
                 
-                // Показуємо AR контейнер
-                document.getElementById('ar-container').style.display = 'block';
-
-                // Створюємо відео елемент
-                const video = document.createElement('video');
-                video.srcObject = cameraStream;
-                video.playsInline = true;
-                video.setAttribute('playsinline', '');
-                video.className = 'video-overlay';
-                
-                const arScene = document.getElementById('ar-scene');
-                arScene.appendChild(video);
-
-                // Запускаємо відео
-                video.play().then(() => {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('magic-ball').style.display = 'block';
+                // Затримка для драматизму
+                setTimeout(() => {
+                    prophecyElement.textContent = getRandomProphecy();
+                    prophecyElement.classList.add('active');
                     
-                    // Симулюємо знаходження маркера через 2 секунди
-                    setTimeout(() => {
-                        simulateMarkerFound();
-                    }, 2000);
-                });
-
-            } catch (error) {
-                console.error('Camera error:', error);
-                document.getElementById('loading').textContent = 'Camera access denied 😢\nPlease allow camera access and try again.';
-                alert('Please allow camera access to see the magic!');
-            }
-        }
-
-        // Симуляція знаходження маркера
-        function simulateMarkerFound() {
-            const magicBall = document.getElementById('magic-ball');
-            magicBall.style.animation = 'pulse 1s ease-in-out infinite';
-            document.getElementById('prophecy-display').textContent = 'Magic ball found! 🎉 Tap it for prophecies!';
-        }
-
-        // Показати пророцтво
-        function showProphecy() {
-            const randomProphecy = prophecies[Math.floor(Math.random() * prophecies.length)];
-            document.getElementById('prophecy-display').textContent = randomProphecy;
-            
-            // Анімація кулі
-            const magicBall = document.getElementById('magic-ball');
-            magicBall.style.animation = 'none';
-            setTimeout(() => {
-                magicBall.style.animation = 'pulse 1s ease-in-out infinite';
-            }, 100);
-            
-            // Зміна кольору
-            const colors = ['#FF69B4', '#9370DB', '#BA55D3', '#FF1493', '#8A2BE2'];
-            magicBall.style.background = `radial-gradient(circle, ${colors[Math.floor(Math.random() * colors.length)]}, #9370DB)`;
-        }
-
-        // Перезапуск камери
-        function restartCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
+                    // Додаткові частинки
+                    createParticles();
+                }, 1000);
             }
             
-            const arScene = document.getElementById('ar-scene');
-            arScene.innerHTML = '<div class="loading" id="loading">Restarting camera... 📱</div><div class="magic-ball" id="magic-ball" onclick="showProphecy()"></div>';
-            
-            document.getElementById('magic-ball').style.display = 'none';
-            startCamera();
-        }
-
-        // Автоматично запустити камеру при кліку на сторінці (для тесту)
-        document.addEventListener('click', function() {
-            if (document.getElementById('start-screen').style.display !== 'none') {
-                startCamera();
+            // Очистити кулю
+            function resetBall() {
+                magicBall.classList.remove('active');
+                prophecyElement.classList.remove('active');
+                setTimeout(() => {
+                    prophecyElement.textContent = '';
+                }, 500);
             }
+            
+            // Обробники подій
+            magicBall.addEventListener('click', showProphecy);
+            getProphecyButton.addEventListener('click', showProphecy);
+            resetBallButton.addEventListener('click', resetBall);
+            
+            // Ініціалізація
+            createParticles();
         });
     </script>
 </body>
 </html>
+
