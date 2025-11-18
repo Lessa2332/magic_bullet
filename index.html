@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Magic Christmas Ball</title>
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.5/dist/mindar-image-aframe.prod.js"></script>
+    <!-- Стабільні версії -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-aframe.prod.js"></script>
     <style>
         * {
             margin: 0;
@@ -294,38 +295,32 @@
             const scene = document.createElement('a-scene');
             currentScene = scene;
             
-            // MindAR configuration
-            scene.setAttribute('mindar-image', `
-                imageTargetSrc: assets/marker.mind;
-                maxTrack: 1;
-                filterMinCF: 0.001;
-                filterBeta: 1000;
-            `);
+            // Проста MindAR конфігурація
+            scene.setAttribute('mindar-image', 'imageTargetSrc: assets/marker.mind; maxTrack: 1;');
             scene.setAttribute('embedded', '');
             scene.setAttribute('renderer', 'colorManagement: true;');
             scene.setAttribute('loading-screen', 'enabled: false;');
 
-            // Camera
+            // Камера
             const camera = document.createElement('a-camera');
             camera.setAttribute('position', '0 0 0');
             camera.setAttribute('look-controls', 'enabled: true');
             camera.setAttribute('cursor', 'rayOrigin: mouse;');
             scene.appendChild(camera);
 
-            // Target
+            // Ціль
             const target = document.createElement('a-entity');
             target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
-            // MAGICAL CRYSTAL BALL - Pink to Purple gradient
+            // МАГІЧНА КРИСТАЛЕВА КУЛЯ
             const crystalBall = document.createElement('a-sphere');
             crystalBall.setAttribute('radius', '0.4');
             crystalBall.setAttribute('color', '#FF69B4');
             crystalBall.setAttribute('transparent', 'true');
             crystalBall.setAttribute('opacity', '0.7');
             crystalBall.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000');
-            crystalBall.setAttribute('class', 'clickable');
 
-            // Inner crystal core
+            // Внутрішнє ядро
             const innerCore = document.createElement('a-sphere');
             innerCore.setAttribute('radius', '0.25');
             innerCore.setAttribute('color', '#9370DB');
@@ -333,7 +328,7 @@
             innerCore.setAttribute('opacity', '0.5');
             innerCore.setAttribute('animation', 'property: rotation; to: 360 0 360; loop: true; dur: 8000');
 
-            // Sparkling outer layer
+            // Блискучий шар
             const sparkleLayer = document.createElement('a-sphere');
             sparkleLayer.setAttribute('radius', '0.45');
             sparkleLayer.setAttribute('color', '#FFFFFF');
@@ -342,46 +337,9 @@
             sparkleLayer.setAttribute('wireframe', 'true');
             sparkleLayer.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 15000');
 
-            // Floating particles around the ball
-            const particles = document.createElement('a-entity');
-            particles.setAttribute('position', '0 0 0');
-            
-            // Create floating sparkles
-            for (let i = 0; i < 8; i++) {
-                const angle = (i / 8) * Math.PI * 2;
-                const sparkle = document.createElement('a-sphere');
-                sparkle.setAttribute('radius', '0.03');
-                sparkle.setAttribute('color', i % 2 === 0 ? '#FF69B4' : '#9370DB');
-                sparkle.setAttribute('position', `${Math.cos(angle) * 0.6} ${Math.sin(angle) * 0.6} 0`);
-                sparkle.setAttribute('animation', `
-                    property: position;
-                    to: ${Math.cos(angle) * 0.8} ${Math.sin(angle) * 0.8} 0;
-                    dir: alternate;
-                    loop: true;
-                    dur: 2000;
-                `);
-                particles.appendChild(sparkle);
-            }
-
-            // Magical glow effect
-            const glow = document.createElement('a-ring');
-            glow.setAttribute('radius-inner', '0.5');
-            glow.setAttribute('radius-outer', '0.7');
-            glow.setAttribute('color', '#FF69B4');
-            glow.setAttribute('transparent', 'true');
-            glow.setAttribute('opacity', '0.4');
-            glow.setAttribute('animation', 'property: scale; to: 1.2 1.2 1; loop: true; dir: alternate; dur: 2000');
-
-            // Add all elements to target
-            target.appendChild(crystalBall);
-            target.appendChild(innerCore);
-            target.appendChild(sparkleLayer);
-            target.appendChild(particles);
-            target.appendChild(glow);
-
-            // Click handler for magic ball
+            // Обробник кліку для магічної кулі
             function handleMagicClick() {
-                // Ball animation
+                // Анімація кулі
                 crystalBall.setAttribute('animation', `
                     property: scale;
                     to: 1.3 1.3 1.3;
@@ -389,55 +347,108 @@
                     dir: alternate;
                 `);
 
-                // Color shift magic
+                // Зміна кольору
                 const colors = ['#FF69B4', '#9370DB', '#BA55D3', '#FF1493', '#8A2BE2'];
                 const randomColor = colors[Math.floor(Math.random() * colors.length)];
                 crystalBall.setAttribute('color', randomColor);
 
-                // Sound effect
+                // Звуковий ефект
                 if (isSoundOn) {
                     const magicSound = new Audio('fon.mp3');
                     magicSound.volume = 0.2;
                     magicSound.play().catch(() => {});
                 }
 
-                // Show random prophecy
+                // Показати випадкове пророцтво
                 newProphecy();
 
-                // Create sparkle burst
+                // Створити спалах іскорок
                 createFairyDust();
             }
 
-            // Add event listeners to all ball parts
+            // Додати обробники подій
             crystalBall.addEventListener('click', handleMagicClick);
             innerCore.addEventListener('click', handleMagicClick);
             sparkleLayer.addEventListener('click', handleMagicClick);
 
+            // Додати всі елементи до цілі
+            target.appendChild(crystalBall);
+            target.appendChild(innerCore);
+            target.appendChild(sparkleLayer);
+
             scene.appendChild(target);
 
-            // Replace scene
+            // Замінити сцену
             const arContainer = document.getElementById('ar-scene');
             arContainer.innerHTML = '';
             arContainer.appendChild(scene);
 
-            // Update loading text
-            setTimeout(() => {
-                const loading = arContainer.querySelector('.loading');
-                if (loading) {
-                    loading.innerHTML = '<p>✨ Magic ball found! ✨</p><p>Tap the glowing ball for your prophecy!</p>';
-                }
-            }, 2000);
-
-            console.log('Magic AR started!');
+            console.log('Magic AR started successfully!');
         }
 
-        // Initialize some fairy dust on load
+        // Альтернативний спосіб - проста сцена без MindAR
+        function startSimpleAR() {
+            createFairyDust();
+            
+            const scene = document.createElement('a-scene');
+            currentScene = scene;
+            
+            // Базова A-Frame сцена без MindAR
+            scene.setAttribute('embedded', '');
+            scene.setAttribute('background', 'color: #000011;');
+
+            // Камера
+            const camera = document.createElement('a-camera');
+            camera.setAttribute('position', '0 1.6 3');
+            camera.setAttribute('look-controls', 'enabled: true');
+            scene.appendChild(camera);
+
+            // Магічна куля
+            const magicBall = document.createElement('a-entity');
+            magicBall.setAttribute('position', '0 1.5 -2');
+            
+            const ball = document.createElement('a-sphere');
+            ball.setAttribute('radius', '0.5');
+            ball.setAttribute('color', '#FF69B4');
+            ball.setAttribute('transparent', 'true');
+            ball.setAttribute('opacity', '0.8');
+            ball.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 8000');
+            
+            const innerBall = document.createElement('a-sphere');
+            innerBall.setAttribute('radius', '0.3');
+            innerBall.setAttribute('color', '#9370DB');
+            innerBall.setAttribute('transparent', 'true');
+            innerBall.setAttribute('opacity', '0.6');
+            innerBall.setAttribute('animation', 'property: rotation; to: 360 0 360; loop: true; dur: 6000');
+
+            // Обробник кліку
+            function handleClick() {
+                ball.setAttribute('animation', 'property: scale; to: 1.2 1.2 1.2; dur: 300; dir: alternate;');
+                const colors = ['#FF69B4', '#9370DB', '#BA55D3'];
+                ball.setAttribute('color', colors[Math.floor(Math.random() * colors.length)]);
+                newProphecy();
+                createFairyDust();
+            }
+
+            ball.addEventListener('click', handleClick);
+            innerBall.addEventListener('click', handleClick);
+
+            magicBall.appendChild(ball);
+            magicBall.appendChild(innerBall);
+            scene.appendChild(magicBall);
+
+            const arContainer = document.getElementById('ar-scene');
+            arContainer.innerHTML = '';
+            arContainer.appendChild(scene);
+
+            console.log('Simple AR started!');
+        }
+
+        // Ініціалізація
         document.addEventListener('DOMContentLoaded', function() {
             createFairyDust();
-            setTimeout(() => {
-                document.getElementById('prophecy-display').textContent = 
-                    "Point your camera at the Christmas marker to begin the magic! ✨";
-            }, 1000);
+            // Автоматично запустити просту версію
+            setTimeout(startSimpleAR, 1000);
         });
     </script>
 </body>
