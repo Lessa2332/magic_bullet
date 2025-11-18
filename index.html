@@ -1,220 +1,496 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AR Гра про Україну</title>
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@master/aframe/build/aframe-ar.js"></script>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      touch-action: none; /* блокує pinch zoom */
-      font-family: Arial, sans-serif;
-    }
-    a-scene {
-      width: 100%;
-      height: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-    #scanText {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #FFD700;
-      font-size: 2em;
-      font-weight: bold;
-      text-shadow: 2px 2px 6px #000;
-      z-index: 10;
-      text-align: center;
-      width: 90%;
-    }
-    #smartLessaBtn {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ff0044;
-      color: white;
-      padding: 14px 24px;
-      border-radius: 30px;
-      font-size: 1.1em;
-      font-weight: bold;
-      text-decoration: none;
-      z-index: 10;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-    #smartLessaBtn:hover {
-      background: #cc0036;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Різдвяна Магічна Куля</title>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-face.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image.prod.js"></script>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #ff0080;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ar-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        #ar-scene {
+            width: 100%;
+            height: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .instructions h2 {
+            color: #ffeb3b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateX(10px);
+        }
+
+        .step-number {
+            background: #ff0080;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .wishes {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .wish-item {
+            background: linear-gradient(45deg, rgba(255, 0, 128, 0.3), rgba(0, 255, 255, 0.3));
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 5px solid #ff0080;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .wish-item:nth-child(even) {
+            animation-delay: 1.5s;
+            border-left-color: #00ffff;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5em;
+        }
+
+        .snowflakes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .snowflake {
+            position: absolute;
+            color: #fff;
+            font-size: 1.5em;
+            animation: fall linear infinite;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px #ff0080;
+            }
+            to {
+                text-shadow: 0 0 30px #00ffff, 0 0 40px #ff0080;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff0080, #00ffff);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
 </head>
 <body>
-  <div id="scanText">Наведи камеру на зображення Hiro маркера</div>
+    <div class="snowflakes" id="snowflakes"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="title">🎄 Різдвяна Магічна Куля ✨</h1>
+            <p class="subtitle">Скануй маркер та відкрий чарівний світ різдвяних побажань!</p>
+        </header>
 
-  <a-scene embedded id="arScene" arjs="sourceType: webcam; detectionMode: mono; trackingMethod: best; facingBack: true;">
-    <a-marker id="marker" preset="hiro">
-      <!-- Контейнер для гри -->
-      <a-entity id="quiz-container" position="0 0 0" rotation="-90 0 0" scale="0.05 0.05 0.05">
-        <a-text id="question-text" value="" position="-1 2 0" width="40" align="center" color="white"></a-text>
-        <a-entity id="optionA" class="option" position="-1 1 0">
-          <a-plane width="2" height="0.5" material="color: blue; opacity: 0.7"></a-plane>
-          <a-text value="" width="35" align="left" color="white" position="-0.9 -0.2 0.01"></a-text>
-        </a-entity>
-        <a-entity id="optionB" class="option" position="-1 0.5 0">
-          <a-plane width="2" height="0.5" material="color: blue; opacity: 0.7"></a-plane>
-          <a-text value="" width="35" align="left" color="white" position="-0.9 -0.2 0.01"></a-text>
-        </a-entity>
-        <a-entity id="optionC" class="option" position="-1 0 0">
-          <a-plane width="2" height="0.5" material="color: blue; opacity: 0.7"></a-plane>
-          <a-text value="" width="35" align="left" color="white" position="-0.9 -0.2 0.01"></a-text>
-        </a-entity>
-        <a-entity id="optionD" class="option" position="-1 -0.5 0">
-          <a-plane width="2" height="0.5" material="color: blue; opacity: 0.7"></a-plane>
-          <a-text value="" width="35" align="left" color="white" position="-0.9 -0.2 0.01"></a-text>
-        </a-entity>
-        <a-entity id="result-container" visible="false">
-          <a-text id="result-text" value="" position="-1 1 0" width="40" align="center" color="yellow"></a-text>
-          <a-entity id="restart-btn" class="clickable" position="-1 0 0">
-            <a-plane width="1.5" height="0.5" material="color: green; opacity: 0.7"></a-plane>
-            <a-text value="Розпочати знову" width="20" align="center" color="white" position="-0.7 -0.2 0.01"></a-text>
-          </a-entity>
-        </a-entity>
-      </a-entity>
-    </a-marker>
-    <a-entity camera>
-      <a-cursor></a-cursor>
-    </a-entity>
-  </a-scene>
+        <div class="content">
+            <div class="ar-section">
+                <div id="ar-scene">
+                    <div class="loading">
+                        <p>🔄 Завантаження магії...</p>
+                        <p>Будь ласка, дай доступ до камери</p>
+                    </div>
+                </div>
+                <div class="control-panel">
+                    <button class="btn" onclick="startAR()">▶️ Старт AR</button>
+                    <button class="btn" onclick="stopAR()">⏹️ Стоп AR</button>
+                    <button class="btn" onclick="toggleSound()">🔊 Звук</button>
+                </div>
+            </div>
 
-  <a href="https://youtube.com/playlist?list=PL6UDFwT9TzFxsVdFiEBsQ9yFpcYRPOpfO&si=IyXv1SkdPyvhcW7Z"
-     id="smartLessaBtn" target="_blank">@SmartLessa</a>
+            <div class="instructions">
+                <h2>📖 Як грати:</h2>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <p>Натисни "Старт AR" та дай дозвіл на використання камери</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <p>Наведи камеру на маркер (marker.mind)</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <p>Дивись, як з'являється магічна куля з побажаннями!</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <p>Натискай на кулю, щоб почути різдвяні побажання</p>
+                </div>
+            </div>
+        </div>
 
-  <script>
-    const marker = document.getElementById('marker');
-    const scanText = document.getElementById('scanText');
-    const quizContainer = document.getElementById('quiz-container');
-    const questionText = document.getElementById('question-text');
-    const optionA = document.getElementById('optionA');
-    const optionB = document.getElementById('optionB');
-    const optionC = document.getElementById('optionC');
-    const optionD = document.getElementById('optionD');
-    const resultContainer = document.getElementById('result-container');
-    const resultText = document.getElementById('result-text');
-    const restartBtn = document.getElementById('restart-btn');
+        <div class="wishes">
+            <h2 style="text-align: center; color: #ffeb3b; margin-bottom: 20px;">
+                🌟 Різдвяні Побажання для Тебе!
+            </h2>
+            <div class="wish-item">
+                <p>Нехай цього Різдва твої очі сяють від радощів, а серце наповниться дивуванням від кожного святкового моменту!</p>
+            </div>
+            <div class="wish-item">
+                <p>Бажаю, щоб під ялинкою тебе чекали найчарівніші подарунки, а Дід Мороз приніс мрії, які збуваються!</p>
+            </div>
+            <div class="wish-item">
+                <p>Хай різдвяна зірка освітить твій шлях до цікавих пригод і нових друзів у наступному році!</p>
+            </div>
+            <div class="wish-item">
+                <p>Нехай кожна сніжинка принесе тобі трохи магії, а кожна різдвяна пісня навчить співати від щастя!</p>
+            </div>
+            <div class="wish-item">
+                <p>Бажаю, щоб ці свята наповнили твій дім сміхом, теплом родини та ароматом домашніх печив!</p>
+            </div>
+        </div>
+    </div>
 
-    // Питання про Україну
-    const questions = [
-      {
-        question: "Яка столиця України?",
-        options: ["A) Львів", "B) Київ", "C) Одеса", "D) Харків"],
-        correct: "B"
-      },
-      {
-        question: "Який колір прапора України?",
-        options: ["A) Червоно-чорний", "B) Синьо-жовтий", "C) Біло-червоний", "D) Зелено-білий"],
-        correct: "B"
-      },
-      {
-        question: "Хто автор тексту гімну України?",
-        options: ["A) Тарас Шевченко", "B) Іван Франко", "C) Павло Чубинський", "D) Леся Українка"],
-        correct: "C"
-      },
-      {
-        question: "Яка найвища гора в Україні?",
-        options: ["A) Говерла", "B) Піп Іван", "C) Роман-Кош", "D) Петрос"],
-        correct: "A"
-      },
-      {
-        question: "Коли Україна здобула незалежність?",
-        options: ["A) 1991 рік", "B) 1918 рік", "C) 1945 рік", "D) 2004 рік"],
-        correct: "A"
-      }
-    ];
+    <script>
+        // Створення сніжинок
+        function createSnowflakes() {
+            const snowflakesContainer = document.getElementById('snowflakes');
+            const snowflakes = ['❄️', '✨', '⭐', '💫', '🔸'];
+            
+            for (let i = 0; i < 50; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+                snowflakesContainer.appendChild(snowflake);
+            }
+        }
 
-    let currentQuestion = 0;
-    let score = 0;
+        // Аудіо менеджер
+        const audio = new Audio('fon.mp3');
+        audio.loop = true;
+        let isSoundOn = true;
 
-    function startQuiz() {
-      currentQuestion = 0;
-      score = 0;
-      resultContainer.setAttribute('visible', false);
-      showQuestion();
-    }
+        function toggleSound() {
+            isSoundOn = !isSoundOn;
+            if (isSoundOn) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
 
-    function showQuestion() {
-      if (currentQuestion < questions.length) {
-        const q = questions[currentQuestion];
-        questionText.setAttribute('value', q.question);
-        optionA.querySelector('a-text').setAttribute('value', q.options[0]);
-        optionB.querySelector('a-text').setAttribute('value', q.options[1]);
-        optionC.querySelector('a-text').setAttribute('value', q.options[2]);
-        optionD.querySelector('a-text').setAttribute('value', q.options[3]);
-      } else {
-        showResult();
-      }
-    }
+        // AR сцена
+        function startAR() {
+            const scene = document.createElement('a-scene');
+            scene.setAttribute('mindar-image', {
+                imageTargetSrc: 'assets/marker.mind',
+                maxTrack: 1,
+                filterMinCF: 0.001,
+                filterBeta: 1000
+            });
+            scene.setAttribute('color-space', 'sRGB');
+            scene.setAttribute('embedded', '');
+            scene.setAttribute('renderer', 'colorManagement: true, physicallyCorrectLights');
+            scene.setAttribute('cursor', 'rayOrigin: mouse');
 
-    function handleAnswer(selected) {
-      const q = questions[currentQuestion];
-      if (selected === q.correct) {
-        score++;
-      }
-      currentQuestion++;
-      showQuestion();
-    }
+            // Додаємо камеру
+            const camera = document.createElement('a-camera');
+            camera.setAttribute('position', '0 0 0');
+            camera.setAttribute('look-controls', 'enabled: false');
+            scene.appendChild(camera);
 
-    function showResult() {
-      questionText.setAttribute('value', '');
-      optionA.querySelector('a-text').setAttribute('value', '');
-      optionB.querySelector('a-text').setAttribute('value', '');
-      optionC.querySelector('a-text').setAttribute('value', '');
-      optionD.querySelector('a-text').setAttribute('value', '');
-      let badge = '★'.repeat(score) + '☆'.repeat(5 - score);
-      resultText.setAttribute('value', `Ви набрали ${score}/5 балів!\n${badge}`);
-      resultContainer.setAttribute('visible', true);
-    }
+            // Створюємо магічну кулю з ПРИМІТИВІВ
+            const target = document.createElement('a-entity');
+            target.setAttribute('mindar-image-target', 'targetIndex: 0');
 
-    // Додаємо обробники кліків
-    optionA.addEventListener('click', () => handleAnswer('A'));
-    optionB.addEventListener('click', () => handleAnswer('B'));
-    optionC.addEventListener('click', () => handleAnswer('C'));
-    optionD.addEventListener('click', () => handleAnswer('D'));
-    restartBtn.addEventListener('click', startQuiz);
+            // ОСНОВНА КУЛЯ (сфера - примітив)
+            const sphere = document.createElement('a-sphere');
+            sphere.setAttribute('radius', '1');
+            sphere.setAttribute('position', '0 0 0');
+            sphere.setAttribute('color', '#ff0080');
+            sphere.setAttribute('transparent', 'true');
+            sphere.setAttribute('opacity', '0.8');
+            sphere.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000');
 
-    // Події маркера
-    marker.addEventListener('markerFound', () => {
-      scanText.style.display = 'none';
-      startQuiz();
-    });
+            // ВНУТРІШНЯ КУБІЧНА СТРУКТУРА (примітив - box)
+            const innerCube = document.createElement('a-box');
+            innerCube.setAttribute('width', '1.2');
+            innerCube.setAttribute('height', '1.2');
+            innerCube.setAttribute('depth', '1.2');
+            innerCube.setAttribute('position', '0 0 0');
+            innerCube.setAttribute('color', '#00ffff');
+            innerCube.setAttribute('transparent', 'true');
+            innerCube.setAttribute('opacity', '0.3');
+            innerCube.setAttribute('wireframe', 'true');
+            innerCube.setAttribute('animation', 'property: rotation; to: 360 360 360; loop: true; dur: 15000');
 
-    marker.addEventListener('markerLost', () => {
-      scanText.style.display = 'block';
-    });
+            // ЗОВНІШНЯ ПІРАМІДА (примітив - cone)
+            const outerPyramid = document.createElement('a-cone');
+            outerPyramid.setAttribute('radius-bottom', '1.5');
+            outerPyramid.setAttribute('radius-top', '0.1');
+            outerPyramid.setAttribute('height', '2');
+            outerPyramid.setAttribute('position', '0 0 0');
+            outerPyramid.setAttribute('color', '#ffff00');
+            outerPyramid.setAttribute('transparent', 'true');
+            outerPyramid.setAttribute('opacity', '0.2');
+            outerPyramid.setAttribute('wireframe', 'true');
+            outerPyramid.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 12000');
 
-    // Перевірка доступу до камери
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => {
-        console.log('Доступ до задньої камери надано');
-      })
-      .catch(err => {
-        scanText.textContent = 'Дозвольте доступ до задньої камери для AR';
-        console.error('Помилка доступу до камери:', err);
-      });
+            // ЦИЛІНДРИ НАВКОЛО (примітив - cylinder)
+            const ring1 = document.createElement('a-cylinder');
+            ring1.setAttribute('radius', '1.8');
+            ring1.setAttribute('height', '0.1');
+            ring1.setAttribute('position', '0 0.5 0');
+            ring1.setAttribute('color', '#ff00ff');
+            ring1.setAttribute('transparent', 'true');
+            ring1.setAttribute('opacity', '0.4');
+            ring1.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 8000');
 
-    // Фікс висоти для мобільних браузерів
-    function fixHeight() {
-      document.body.style.height = window.innerHeight + 'px';
-    }
-    window.addEventListener('resize', fixHeight);
-    fixHeight();
-  </script>
+            const ring2 = document.createElement('a-cylinder');
+            ring2.setAttribute('radius', '1.8');
+            ring2.setAttribute('height', '0.1');
+            ring2.setAttribute('position', '0 -0.5 0');
+            ring2.setAttribute('color', '#00ff00');
+            ring2.setAttribute('transparent', 'true');
+            ring2.setAttribute('opacity', '0.4');
+            ring2.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 8000');
+
+            // ПЛОСКІ ФІГУРИ (примітив - plane) - різдвяні символи
+            const star = document.createElement('a-plane');
+            star.setAttribute('width', '0.3');
+            star.setAttribute('height', '0.3');
+            star.setAttribute('position', '1.5 0 0');
+            star.setAttribute('color', '#FFD700');
+            star.setAttribute('animation', 'property: rotation; to: 0 0 360; loop: true; dur: 4000');
+
+            const heart = document.createElement('a-plane');
+            heart.setAttribute('width', '0.3');
+            heart.setAttribute('height', '0.3');
+            heart.setAttribute('position', '0 1.5 0');
+            heart.setAttribute('color', '#FF1493');
+            heart.setAttribute('animation', 'property: rotation; to: 360 0 0; loop: true; dur: 5000');
+
+            // ТОР (примітив - torus) - додаткова геометрія
+            const torus = document.createElement('a-torus');
+            torus.setAttribute('radius', '1.3');
+            torus.setAttribute('radius-tubular', '0.05');
+            torus.setAttribute('position', '0 0 0');
+            torus.setAttribute('color', '#4B0082');
+            torus.setAttribute('animation', 'property: rotation; to: 0 360 360; loop: true; dur: 10000');
+
+            // ОСТАННІЙ ПРИМІТИВ - octahedron
+            const octahedron = document.createElement('a-octahedron');
+            octahedron.setAttribute('radius', '0.8');
+            octahedron.setAttribute('position', '0 0 0');
+            octahedron.setAttribute('color', '#FF4500');
+            octahedron.setAttribute('transparent', 'true');
+            octahedron.setAttribute('opacity', '0.5');
+            octahedron.setAttribute('wireframe', 'true');
+            octahedron.setAttribute('animation', 'property: rotation; to: 360 360 0; loop: true; dur: 13000');
+
+            // Додаємо всі примітиви до цілі
+            target.appendChild(sphere);
+            target.appendChild(innerCube);
+            target.appendChild(outerPyramid);
+            target.appendChild(ring1);
+            target.appendChild(ring2);
+            target.appendChild(star);
+            target.appendChild(heart);
+            target.appendChild(torus);
+            target.appendChild(octahedron);
+            scene.appendChild(target);
+
+            // Обробник кліку на будь-який примітив
+            function addClickHandler(element) {
+                element.addEventListener('click', function() {
+                    // Анімація при кліку
+                    element.setAttribute('animation', {
+                        property: 'scale',
+                        to: '1.3 1.3 1.3',
+                        dur: 300,
+                        dir: 'alternate'
+                    });
+
+                    // Відтворюємо звук
+                    if (isSoundOn) {
+                        const clickSound = new Audio('fon.mp3');
+                        clickSound.volume = 0.3;
+                        clickSound.play();
+                    }
+
+                    // Випадкове побажання
+                    const wishes = document.querySelectorAll('.wish-item');
+                    const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+                    
+                    // Підсвічуємо вибране побажання
+                    wishes.forEach(w => w.style.background = 'rgba(255, 255, 255, 0.1)');
+                    randomWish.style.background = 'linear-gradient(45deg, rgba(255, 215, 0, 0.4), rgba(255, 0, 128, 0.4))';
+                });
+            }
+
+            // Додаємо обробники кліку до всіх примітивів
+            addClickHandler(sphere);
+            addClickHandler(innerCube);
+            addClickHandler(outerPyramid);
+            addClickHandler(ring1);
+            addClickHandler(ring2);
+            addClickHandler(star);
+            addClickHandler(heart);
+            addClickHandler(torus);
+            addClickHandler(octahedron);
+
+            // Замінюємо контейнер AR сценою
+            const arContainer = document.getElementById('ar-scene');
+            arContainer.innerHTML = '';
+            arContainer.appendChild(scene);
+
+            // Запускаємо звук
+            if (isSoundOn) {
+                audio.play();
+            }
+        }
+
+        function stopAR() {
+            const arContainer = document.getElementById('ar-scene');
+            arContainer.innerHTML = '<div class="loading"><p>🔄 AR зупинено</p><p>Натисни "Старт AR" щоб продовжити</p></div>';
+            audio.pause();
+        }
+
+        // Ініціалізація
+        document.addEventListener('DOMContentLoaded', function() {
+            createSnowflakes();
+        });
+    </script>
 </body>
 </html>
