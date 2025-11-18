@@ -24,6 +24,7 @@
             border-radius: 10px;
             z-index: 1000;
             max-width: 300px;
+            font-size: 14px;
         }
         
         .prophecy-text {
@@ -42,6 +43,12 @@
             max-width: 80%;
             border: 2px solid gold;
         }
+        
+        .marker-link {
+            color: #4ecdc4;
+            text-decoration: underline;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -49,7 +56,7 @@
         <h3>AR Магічна Куля</h3>
         <p>1. Наведіть камеру на маркер</p>
         <p>2. Натисніть на кулю для пророцтва</p>
-        <p>Маркер: <a href="#" onclick="downloadMarker()">Завантажити маркер</a></p>
+        <p>Маркер: <span class="marker-link" onclick="downloadMarker()">Завантажити</span></p>
     </div>
     
     <div class="prophecy-text" id="prophecyText"></div>
@@ -62,10 +69,8 @@
         cursor="rayOrigin: mouse"
         raycaster="objects: .clickable">
         
-        <!-- Маркер -->
-        <a-marker type="pattern" preset="custom" url="assets/marker.patt">
-            
-            <!-- Основа кулі - сфера -->
+        <a-marker type="pattern" url="assets/marker.patt">
+            <!-- Основна куля -->
             <a-sphere 
                 class="clickable"
                 id="magicBall"
@@ -74,22 +79,20 @@
                 color="#1a1a2e"
                 transparent="true"
                 opacity="0.9"
-                shader="standard"
                 metalness="0.8"
                 roughness="0.2">
                 
-                <!-- Внутрішнє світіння -->
+                <!-- Внутрішня куля -->
                 <a-sphere 
                     radius="0.45"
                     color="#0f3460"
                     transparent="true"
                     opacity="0.6"
-                    shader="standard"
                     metalness="0.9"
                     roughness="0.1">
                 </a-sphere>
                 
-                <!-- Ефект блискітки -->
+                <!-- Блискіт -->
                 <a-circle 
                     radius="0.5"
                     position="0.2 0.2 0.3"
@@ -99,25 +102,21 @@
                     rotation="0 0 45">
                 </a-circle>
                 
-                <!-- Магічні частинки навколо кулі -->
-                <a-entity id="particles-container">
-                    <!-- Частинки будуть додані через JavaScript -->
-                </a-entity>
+                <!-- Частинки -->
+                <a-entity id="particles-container"></a-entity>
                 
-                <!-- Текст пророцтва -->
+                <!-- Текст -->
                 <a-text 
                     id="prophecy"
-                    value="Натисни мене"
+                    value="Натисни"
                     align="center"
                     position="0 0 0.6"
                     color="#ffd700"
-                    scale="2 2 2"
-                    width="3">
+                    scale="2 2 2">
                 </a-text>
-                
             </a-sphere>
             
-            <!-- Підставка для кулі -->
+            <!-- Підставка -->
             <a-cylinder 
                 position="0 -0.6 0"
                 radius="0.3"
@@ -127,7 +126,7 @@
                 roughness="0.3">
             </a-cylinder>
             
-            <!-- Декоративні елементи навколо -->
+            <!-- Кільце -->
             <a-ring 
                 position="0 -0.55 0"
                 radius-inner="0.35"
@@ -136,49 +135,38 @@
                 rotation="-90 0 0">
             </a-ring>
             
-            <!-- Магічні кристали навколо -->
-            <a-entity id="crystals-container">
-                <!-- Кристали будуть додані через JavaScript -->
-            </a-entity>
-            
+            <!-- Кристали -->
+            <a-entity id="crystals-container"></a-entity>
         </a-marker>
         
-        <!-- Камера -->
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        // Список пророцтв
         const prophecies = [
-            "Твоє майбутнє сяє яскраво! ✨",
-            "Несподівана зустріч змінить все! 🔮",
-            "Вір у себе - ти можеш все! 💫",
-            "Найкращі моменти ще попереду! 🌟",
-            "Ти знайдеш відповіді! 🔍",
-            "Нове захоплення чекає на тебе! 🎯",
-            "Подорож відкриє нові горизонти! 🗺️",
-            "Наполегливість буде винагороджена! 🏆",
-            "Зустріч з другом принесе радість! 👥",
-            "Творчість розкриється повністю! 🎨",
-            "Фінансове благополуччя близько! 💰",
-            "Знайдеш спокій серед хаосу! ☮️",
-            "Нова можливість несподівано з'явиться! 🚀",
-            "Доброта повернеться подвійно! ❤️",
-            "Відкриття змінить твій світ! 🌍"
+            "Твоє майбутнє сяє яскраво!",
+            "Несподівана зустріч змінить все!",
+            "Вір у себе - ти можеш все!",
+            "Найкращі моменти ще попереду!",
+            "Ти знайдеш відповіді!",
+            "Нове захоплення чекає на тебе!",
+            "Подорож відкриє нові горизонти!",
+            "Наполегливість буде винагороджена!",
+            "Зустріч з другом принесе радість!",
+            "Творчість розкриється повністю!"
         ];
         
-        // Створення частинок
         function createParticles() {
             const container = document.getElementById('particles-container');
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 10; i++) {
                 const particle = document.createElement('a-sphere');
-                particle.setAttribute('radius', '0.03');
+                particle.setAttribute('radius', '0.02');
                 particle.setAttribute('color', getRandomColor());
-                particle.setAttribute('position', getRandomPosition(0.7));
+                particle.setAttribute('position', getRandomPosition(0.6));
                 particle.setAttribute('animation', {
                     property: 'position',
-                    to: getRandomPosition(0.7),
-                    dur: 2000 + Math.random() * 3000,
+                    to: getRandomPosition(0.6),
+                    dur: 2000 + Math.random() * 2000,
                     loop: true,
                     dir: 'alternate'
                 });
@@ -186,44 +174,39 @@
             }
         }
         
-        // Створення кристалів навколо
         function createCrystals() {
             const container = document.getElementById('crystals-container');
             const positions = [
                 {x: 0.8, y: -0.3, z: 0},
                 {x: -0.8, y: -0.3, z: 0},
                 {x: 0, y: -0.3, z: 0.8},
-                {x: 0, y: -0.3, z: -0.8},
-                {x: 0.6, y: -0.3, z: 0.6},
-                {x: -0.6, y: -0.3, z: -0.6}
+                {x: 0, y: -0.3, z: -0.8}
             ];
             
             positions.forEach(pos => {
                 const crystal = document.createElement('a-cone');
-                crystal.setAttribute('radius-bottom', '0.05');
+                crystal.setAttribute('radius-bottom', '0.04');
                 crystal.setAttribute('radius-top', '0.01');
-                crystal.setAttribute('height', '0.2');
+                crystal.setAttribute('height', '0.15');
                 crystal.setAttribute('color', getRandomCrystalColor());
                 crystal.setAttribute('position', pos);
-                crystal.setAttribute('rotation', '0 0 0');
                 crystal.setAttribute('animation', {
                     property: 'rotation',
                     to: '0 360 0',
-                    dur: 4000 + Math.random() * 4000,
+                    dur: 3000 + Math.random() * 3000,
                     loop: true
                 });
                 container.appendChild(crystal);
             });
         }
         
-        // Допоміжні функції
         function getRandomColor() {
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#feca57'];
             return colors[Math.floor(Math.random() * colors.length)];
         }
         
         function getRandomCrystalColor() {
-            const colors = ['#ffd700', '#c0c0c0', '#b9f2ff', '#ff69b4', '#98fb98'];
+            const colors = ['#ffd700', '#c0c0c0', '#b9f2ff'];
             return colors[Math.floor(Math.random() * colors.length)];
         }
         
@@ -240,7 +223,6 @@
             return prophecies[Math.floor(Math.random() * prophecies.length)];
         }
         
-        // Обробник кліку на кулю
         document.addEventListener('DOMContentLoaded', function() {
             const magicBall = document.getElementById('magicBall');
             const prophecyElement = document.getElementById('prophecy');
@@ -250,7 +232,6 @@
             createCrystals();
             
             magicBall.addEventListener('click', function() {
-                // Анімація кулі
                 magicBall.setAttribute('animation', {
                     property: 'scale',
                     from: '1 1 1',
@@ -260,18 +241,14 @@
                     dir: 'alternate'
                 });
                 
-                // Зміна кольору
                 magicBall.setAttribute('color', '#4a148c');
                 
-                // Отримання пророцтва
                 const prophecy = getRandomProphecy();
                 prophecyElement.setAttribute('value', prophecy);
                 
-                // Показ тексту пророцтва на екрані
                 prophecyText.textContent = prophecy;
                 prophecyText.style.display = 'block';
                 
-                // Автоматичне приховування через 5 секунд
                 setTimeout(() => {
                     prophecyText.style.display = 'none';
                     magicBall.setAttribute('color', '#1a1a2e');
@@ -279,9 +256,7 @@
             });
         });
         
-        // Функція для завантаження маркера
         function downloadMarker() {
-            // Створення посилання для завантаження маркера
             const link = document.createElement('a');
             link.href = 'https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png';
             link.download = 'magic-ball-marker.png';
