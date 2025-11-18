@@ -34,19 +34,20 @@
             font-size: 1em;
             pointer-events: auto;
         }
-        /* Fallback плейсхолдер для камери на десктопі (замініть src на реальне відео/зображення) */
+        /* Fallback плейсхолдер для камери на десктопі (статичне зображення для надійності) */
         #camera-fallback {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: -1;
             object-fit: cover;
             display: none;
+            background: linear-gradient(45deg, #1e3c72, #2a5298); /* Fallback колір, якщо зображення не завантажиться */
         }
     </style>
 </head>
 <body>
-    <!-- Fallback: тестове відео (замініть src на ваше, наприклад, локальне 'bg.mp4') -->
-    <video id="camera-fallback" src="https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4" autoplay loop muted playsinline></video>
+    <!-- Fallback: статичне зображення для десктопу (замініть src на локальне, якщо потрібно) -->
+    <img id="camera-fallback" src="https://via.placeholder.com/1920x1080/1e3c72/ffffff?text=AR+Simulation" alt="AR Background Simulation" style="width:100%; height:100%; object-fit:cover;">
     
     <button id="sound-btn">🔊 Увімкнути звук</button>
     <a-scene
@@ -60,7 +61,7 @@
     >
         <a-assets>
             <audio id="bg-music" src="fon.mp3" preload="auto" loop></audio>
-            <audio id="prophecy-sound" src="sparkle.mp3" preload="auto"></audio>
+            <!-- Опціональний звук: якщо sparkle.mp3 відсутній, пропустимо -->
         </a-assets>
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
         <a-entity mindar-image-target="targetIndex: 0">
@@ -113,7 +114,6 @@
     </a-scene>
     <script>
         const bgMusic = document.getElementById('bg-music');
-        const prophecySound = document.getElementById('prophecy-sound');
         const loader = document.getElementById('loader');
         const sphere = document.getElementById('magic-sphere');
         const sparkleLight = document.getElementById('sparkle-light');
@@ -136,8 +136,7 @@
         isMobileAR = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (!isMobileAR) {
             console.log("🖥️ Десктоп: Увімкнено fallback без AR-камери");
-            cameraFallback.style.display = 'block';
-            cameraFallback.play().catch(e => console.log("Fallback video failed:", e)); // Фікс: автозапуск
+            cameraFallback.style.display = 'block'; // Показуємо зображення (замість відео)
             loader.setAttribute('visible', 'false');
             sphere.setAttribute('visible', 'true');
             isTargetActive = true;
@@ -154,7 +153,7 @@
             }
         });
 
-        // Функція пророцтва
+        // Функція пророцтва (без залежності від prophecy-sound)
         function showProphecy() {
             const parent = sphere.parentNode;
             if (!parent) return;
@@ -181,11 +180,7 @@
 
             parent.appendChild(text);
 
-            // Ефекти (з перевірками)
-            if (prophecySound) {
-                prophecySound.currentTime = 0;
-                prophecySound.play().catch(e => console.log("🔇 Prophecy sound:", e));
-            }
+            // Ефекти (без аудіо-звуку, тільки візуал)
             particles.setAttribute('visible', 'true');
             particles.setAttribute('animation__particles', 'property: opacity; from: 0; to: 1; dur: 500; startEvents: startParticles');
             particles.emit('startParticles');
@@ -204,33 +199,23 @@
                 }
                 setTimeout(() => {
                     particles.setAttribute('visible', 'false');
-                    particles.setAttribute('animation__particles', null); // Очищення анімації для наступного разу
+                    particles.setAttribute('animation__particles', null);
                 }, 1000);
             }, 5000);
         }
 
-        // Обробка MindAR (автоматичний старт, з перевіркою)
-        const startMindAR = () => {
-            scene.addEventListener('renderstart', () => {
-                console.log("🎥 A-Frame рендер стартував");
-                const mindar = scene.components['mindar-image'];
-                if (mindar && !mindar.isStarted) { // Фікс: перевірка на вже запущений
-                    mindar.start().then(() => {
-                        console.log("✅ MindAR/камера активна!");
-                        if (cameraFallback) cameraFallback.style.display = 'none';
-                    }).catch(err => {
-                        console.error("❌ MindAR помилка (маркер/permissions):", err);
-                    });
-                } else {
-                    console.log("MindAR вже запущений або недоступний");
-                }
-            });
-        };
+        // Обробка MindAR (без ручного start() — автоматичний)
+        scene.addEventListener('renderstart', () => {
+            console.log("🎥 A-Frame рендер стартував — MindAR стартує автоматично");
+            // Не викликаємо mindar.start() — MindAR-AFrame робить це сам
+            if (cameraFallback && !isMobileAR) {
+                cameraFallback.style.display = 'none'; // Ховаємо fallback, якщо AR працює
+            }
+        });
 
         // AR події
         const target = document.querySelector('[mindar-image-target]');
         if (target) {
-            startMindAR();
             target.addEventListener('targetFound', () => {
                 isTargetActive = true;
                 loader.setAttribute('visible', 'false');
@@ -238,6 +223,7 @@
                 if (bgMusic && bgMusic.paused) {
                     bgMusic.play().catch(e => console.log("🔇 BG music:", e));
                 }
+                console.log("✅ Маркер знайдено!");
             });
             target.addEventListener('targetLost', () => {
                 isTargetActive = false;
@@ -246,6 +232,7 @@
                 [...document.querySelectorAll('[data-prophecy]')].forEach(el => el.remove());
                 particles.setAttribute('visible', 'false');
                 sparkleLight.setAttribute('light: intensity', '0');
+                console.log("❌ Маркер втрачено");
             });
         }
 
