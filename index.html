@@ -8,17 +8,16 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { 
-            width: 100%; height: 100%; overflow: hidden; 
+        html, body {
+            width: 100%; height: 100%; overflow: hidden;
             background: #000;
             font-family: Arial, sans-serif;
         }
-        a-scene { 
-            position: fixed; top: 0; left: 0; 
-            width: 100% !important; height: 100% !important; 
-            background: transparent; 
+        a-scene {
+            position: fixed; top: 0; left: 0;
+            width: 100% !important; height: 100% !important;
+            background: transparent;
         }
-
         /* Кнопка звуку — зовні сцени, але не перекривається */
         #sound-btn {
             position: absolute;
@@ -41,7 +40,6 @@
 <body>
     <!-- 🔊 Кнопка звуку — ЗОВНІ сцени, але з високим z-index -->
     <button id="sound-btn">🔊 Увімкнути звук</button>
-
     <a-scene
         mindar-image="imageTargetSrc: assets/marker.mind; maxTrack: 1"
         embedded
@@ -53,10 +51,9 @@
     >
         <a-assets>
             <audio id="bg-music" src="fon.mp3" preload="auto" loop></audio>
+            <audio id="prophecy-sound" src="sparkle.mp3" preload="auto"></audio> <!-- Додатковий звук для пророцтва (опціонально, додайте файл) -->
         </a-assets>
-
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
         <a-entity mindar-image-target="targetIndex: 0">
             <a-sphere
                 id="magic-sphere"
@@ -81,22 +78,50 @@
                     dur="10000"
                     repeat="indefinite"
                 ></a-animation>
+                <!-- Додатковий ефект блиску для магії -->
+                <a-entity id="sparkle-light" light="type: point; intensity: 0; color: #FFD700" position="0 0 0"></a-entity>
             </a-sphere>
+            <!-- Система частинок для магічного ефекту (активується при пророцтві) -->
+            <a-entity id="particles" particle-system="
+                preset: dust;
+                color: #FFD700,#FF00FF,#00B0FF;
+                particleCount: 200;
+                velocityValue: 0 0 0;
+                velocitySpread: 2 2 2;
+                accelerationValue: 0 -9.8 0;
+                accelerationSpread: 0 0 0;
+                startSize: 0.05;
+                endSize: 0.01;
+                startOpacity: 1;
+                endOpacity: 0;
+                duration: 3;
+                opacity: 0;
+            " position="0 0 0" visible="false"></a-entity>
         </a-entity>
-
         <!-- Лоадер (всередині сцени) -->
         <a-entity id="loader" position="0 0 -2" visible="true">
             <a-plane width="3" height="1.2" color="#0a0f2c" opacity="0.8" side="double"></a-plane>
             <a-text value="Наведи камеру на маркер!" align="center" color="#00b0ff" width="2.5" position="0 0 0.01"></a-text>
         </a-entity>
     </a-scene>
-
     <script>
         const bgMusic = document.getElementById('bg-music');
+        const prophecySound = document.getElementById('prophecy-sound');
         const loader = document.getElementById('loader');
         const sphere = document.getElementById('magic-sphere');
+        const sparkleLight = document.getElementById('sparkle-light');
+        const particles = document.getElementById('particles');
         const soundBtn = document.getElementById('sound-btn');
         let isTargetActive = false;
+        
+        // Масив рандомних пророцтв для магічного ефекту
+        const prophecies = [
+            "Щасливого Різдва!",
+            "Бажаю дива в Новому році!",
+            "Нехай мрії збуваються!",
+            "Любов і тепло у твоєму домі!",
+            "Магія вірить у тебе! ✨"
+        ];
 
         // 🔊 Кнопка звуку — незалежна від AR
         soundBtn.addEventListener('click', () => {
@@ -109,37 +134,73 @@
             }
         });
 
-        // Показ пророцтва НА ЕКВАТОРІ
+        // Показ пророцтва НА ЕКВАТОРІ (оновлена версія з рандомом, частинками та звуком)
         function showProphecy() {
             const parent = sphere.parentNode;
-            const message = "Щасливого Різдва!";
+            if (!parent) return; // Фікс: перевірка на існування
 
+            const message = prophecies[Math.floor(Math.random() * prophecies.length)]; // Рандомне пророцтво
             // Видаляємо старий текст
             [...parent.querySelectorAll('[data-prophecy]')].forEach(el => el.remove());
 
-            // Текст на екваторі: Y=0, Z=0.85 (трохи попереду кулі)
+            // Текст на екваторі: Y=0, Z=0.9 (трохи далі, щоб не зливатися з кулею)
             const text = document.createElement('a-text');
             text.setAttribute('value', message);
-            text.setAttribute('position', '0 0 0.85'); // ← ось тут — екватор!
-            text.setAttribute('color', '#FFD700');
-            text.setAttribute('width', '2.4');
+            text.setAttribute('position', '0 0 0.9'); // Збільшено Z для кращої видимості
+            text.setAttribute('color', '#FFD700'); // Золотий — яскравий
+            text.setAttribute('width', '3.0'); // Збільшено ширину для мобільного
             text.setAttribute('align', 'center');
-            text.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
+            // Fallback шрифт: вбудований, без CDN
+            text.setAttribute('font', 'kelsonsans'); // Вбудований A-Frame шрифт (завжди доступний)
+            // Анімація fade-in: з startEvents для контролю
             text.setAttribute('opacity', '0');
-            text.setAttribute('animation__fade', 'property: opacity; from: 0; to: 1; dur: 1000; easing: easeOutCubic');
+            text.setAttribute('animation__fadein', 
+                'property: opacity; from: 0; to: 1; dur: 1500; easing: easeOutCubic; startEvents: startFadeIn'
+            );
+            // Додаткова анімація: пульсація кольору для магії
+            text.setAttribute('animation__pulse', 
+                'property: color; from: #FFD700; to: #FF4500; dir: alternate; dur: 500; repeat: 4; startEvents: startFadeIn'
+            );
             text.setAttribute('data-prophecy', 'true');
             text.setAttribute('side', 'double');
 
             parent.appendChild(text);
-            setTimeout(() => text.emit('fadein'), 100);
 
+            // Магічні ефекти: звук, частинки, блиск
+            if (!prophecySound.paused && !prophecySound.ended) {
+                prophecySound.currentTime = 0;
+                prophecySound.play().catch(e => console.log("🔇 Prophecy sound failed:", e));
+            }
+            // Активація частинок
+            particles.setAttribute('visible', 'true');
+            particles.setAttribute('animation__particles', 'property: opacity; from: 0; to: 1; dur: 500; startEvents: startParticles');
+            particles.emit('startParticles');
+            // Блиск кулі
+            sparkleLight.setAttribute('light: intensity', '1');
+            setTimeout(() => sparkleLight.setAttribute('light: intensity', '0'), 2000);
+
+            // Запуск fade-in (з затримкою для "магічного" ефекту)
+            setTimeout(() => {
+                if (text.parentNode) text.emit('startFadeIn');
+            }, 200);
+
+            // Fade-out через 5 сек (після fade-in + пауза)
             setTimeout(() => {
                 if (text.parentNode) {
-                    text.setAttribute('animation__out', 'property: opacity; to: 0; dur: 800; startEvents: fadeout');
-                    text.emit('fadeout');
-                    setTimeout(() => { if (text.parentNode) text.parentNode.removeChild(text); }, 800);
+                    text.setAttribute('animation__fadeout', 
+                        'property: opacity; to: 0; dur: 1000; startEvents: startFadeOut'
+                    );
+                    text.emit('startFadeOut');
+                    // Видалення після анімації
+                    setTimeout(() => { 
+                        if (text.parentNode) text.parentNode.removeChild(text); 
+                    }, 1000);
                 }
-            }, 4000);
+                // Приховати частинки
+                setTimeout(() => {
+                    particles.setAttribute('animation__hide', 'property: opacity; to: 0; dur: 500');
+                }, 1000);
+            }, 5000);
         }
 
         // Обробка маркера
@@ -149,14 +210,19 @@
                 isTargetActive = true;
                 loader.setAttribute('visible', 'false');
                 sphere.setAttribute('visible', 'true');
+                // Автозапуск фонової музики при знаходженні маркера (з перевіркою)
+                if (bgMusic.paused) {
+                    bgMusic.play().catch(e => console.log("🔇 BG music failed:", e));
+                }
             });
-
             target.addEventListener('targetLost', () => {
                 isTargetActive = false;
                 loader.setAttribute('visible', 'true');
                 sphere.setAttribute('visible', 'false');
-                // При втраті маркера — приховуємо пророцтво
+                // При втраті маркера — приховуємо пророцтво та ефекти
                 [...sphere.parentNode.querySelectorAll('[data-prophecy]')].forEach(el => el.remove());
+                particles.setAttribute('visible', 'false');
+                sparkleLight.setAttribute('light: intensity', '0');
             });
         }
 
